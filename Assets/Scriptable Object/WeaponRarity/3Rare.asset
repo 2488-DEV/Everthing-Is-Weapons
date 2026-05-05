@@ -15,3 +15,4 @@ MonoBehaviour:
   rarityName: Rare
   rarityDamage: 3
   rarityDurability: 400
+  rarityChance: 15

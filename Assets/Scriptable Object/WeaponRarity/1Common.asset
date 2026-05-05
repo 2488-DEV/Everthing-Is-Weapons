@@ -15,3 +15,4 @@ MonoBehaviour:
   rarityName: Common
   rarityDamage: 0
   rarityDurability: 100
+  rarityChance: 50

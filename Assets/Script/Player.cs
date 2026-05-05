@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
     private Camera mainCam; 
     private SpriteRenderer handSR;
     private SpriteRenderer weaponSR;
+
+    private bool weaponInRange = false;
     void Start()
     {
         mainCam = Camera.main; 
@@ -31,11 +33,14 @@ public class Player : MonoBehaviour
 
         HandleFlipAndMovementLogic();
 
-        Debug.Log(weaponHandler.transform.position.x);
-
         if (Input.GetMouseButtonDown(0))
         {
             Attack();
+        }
+
+        if (weaponInRange && Input.GetKeyDown(KeyCode.E))
+        {
+            Debug.Log("หยิบ");
         }
     }
     void Attack()
@@ -53,7 +58,7 @@ public class Player : MonoBehaviour
         if (isMouseOnLeft)
         {
             handTransform.rotation = Quaternion.Euler(0, 0, angle + 180f);
-            if (handSR != null) handSR.sortingOrder = 1;
+            if (handSR != null) handSR.sortingOrder = 3;
             if (weaponSR != null) weaponSR.sortingOrder = 2;
             if (weaponHandler.localPosition.x > 0)
             {
@@ -117,5 +122,31 @@ public class Player : MonoBehaviour
 
         
         rb.linearVelocity = moveInput * currentSpeed;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision) 
+    {
+        if (collision.gameObject.CompareTag("Weapon"))
+        {
+            ItemPickup item = collision.gameObject.GetComponent<ItemPickup>();
+
+            if (item != null && item.weaponData != null)
+            {
+                Debug.Log("เจอไอเทม: " + item.weaponData.weaponName + 
+          "\nระดับความหายาก: " + item.weaponRarity.rarityName + 
+          "\nดาเมจรวม: " + item.FinalDamage + 
+          "\nความเร็วรวม: " + item.weaponData.AttackSpeed);
+
+                weaponInRange = true;
+            }
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Weapon"))
+        {
+            weaponInRange = false;
+        }
     }
 }

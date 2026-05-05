@@ -15,3 +15,4 @@ MonoBehaviour:
   rarityName: Legendary
   rarityDamage: 8
   rarityDurability: 850
+  rarityChance: 2.5

@@ -30,6 +30,5 @@ public class WeaponHandler : MonoBehaviour
         }
     
         sr.sprite = currentWeapon.itemModel;
-        Debug.Log("เปลี่ยนรูปอาวุธเป็น: " + currentWeapon.weaponName);
     }
 }
