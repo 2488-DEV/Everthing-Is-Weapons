@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: 1ShortMelee
   m_EditorClassIdentifier: 
   typeName: Short Melee
-  baseAttackSpeed: 2
+  baseAttackSpeed: 0.8
   baseReach: 2

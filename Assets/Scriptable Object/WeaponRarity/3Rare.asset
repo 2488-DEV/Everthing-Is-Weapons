@@ -16,3 +16,4 @@ MonoBehaviour:
   rarityDamage: 3
   rarityDurability: 400
   rarityChance: 15
+  rarityColor: {r: 0, g: 0.9896784, b: 1, a: 0}

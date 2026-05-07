@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: 3LongMelee
   m_EditorClassIdentifier: 
   typeName: Long Melee
-  baseAttackSpeed: 0.8
+  baseAttackSpeed: 2.5
   baseReach: 6

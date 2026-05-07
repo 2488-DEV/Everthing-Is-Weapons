@@ -7,4 +7,5 @@ public class WeaponRarity : ScriptableObject
     public float rarityDamage;
     public float rarityDurability;
     public float rarityChance;
+    public Color rarityColor;
 }
