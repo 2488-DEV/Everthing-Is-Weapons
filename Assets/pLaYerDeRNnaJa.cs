@@ -14,6 +14,7 @@ public class pLaYerDeRNnaJa : MonoBehaviour
     {
         moveInputX = Input.GetAxis("Horizontal");
         moveInputY = Input.GetAxis("Vertical");
+
         moveDirection = new Vector2(moveInputX,moveInputY).normalized;
         rb.linearVelocity = new Vector2(moveDirection.x * moveSpeed, moveDirection.y * moveSpeed);
     
