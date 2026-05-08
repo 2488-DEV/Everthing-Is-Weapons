@@ -23,26 +23,19 @@ public class MainMenuControl : MonoBehaviour
     public Slider sfxSlider;
     public AudioSource sfxSource;
 
-    // --- ส่วนที่เพิ่มมาใหม่กวัก! ---
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (settingPanel != null)
             {
-                // ถ้าเปิดอยู่ให้ปิด ถ้าปิดอยู่ให้เปิด
                 if (settingPanel.activeSelf)
-                {
                     settingPanel.SetActive(false);
-                }
                 else
-                {
-                    OpenSetting(); // ใช้ฟังก์ชันเดิมของนายเพื่อปิด Panel อื่นก่อน
-                }
+                    OpenSetting();
             }
         }
     }
-    // -------------------------
 
     void Start()
     {
@@ -75,28 +68,21 @@ public class MainMenuControl : MonoBehaviour
     {
         if (string.IsNullOrEmpty(sceneName))
         {
-            Debug.LogError("นายลืมพิมพ์ชื่อ Scene ในช่อง OnClick หรือเปล่ากวัก?!");
+            Debug.LogError("นายลืมพิมพ์ชื่อ Scene กวัก?!");
             yield break;
         }
-        Debug.Log("รอ 2 วินาทีก่อนเปลี่ยน Scene กวัก...");
         yield return new WaitForSeconds(2.0f);
         SceneManager.LoadScene(sceneName);
     }
 
     public void LoadTargetScene(string sceneName)
     {
-        if (!string.IsNullOrEmpty(sceneName))
-        {
-            SceneManager.LoadScene(sceneName);
-        }
+        if (!string.IsNullOrEmpty(sceneName)) SceneManager.LoadScene(sceneName);
     }
 
     public void PlayCustomSound(AudioClip clip)
     {
-        if (sfxSource != null && clip != null)
-        {
-            sfxSource.PlayOneShot(clip);
-        }
+        if (sfxSource != null && clip != null) sfxSource.PlayOneShot(clip);
     }
 
     public void SetBGMVolume(float sliderValue)
@@ -121,23 +107,9 @@ public class MainMenuControl : MonoBehaviour
         PlayerPrefs.SetFloat("SFXVolume", sliderValue);
     }
 
-    public void OpenSetting()
-    {
-        CloseAllPanels();
-        if (settingPanel != null) settingPanel.SetActive(true);
-    }
-
-    public void OpenInformation()
-    {
-        CloseAllPanels();
-        if (informationPanel != null) informationPanel.SetActive(true);
-    }
-
-    public void OpenHowToPlay()
-    {
-        CloseAllPanels();
-        if (howToPlayPanel != null) howToPlayPanel.SetActive(true);
-    }
+    public void OpenSetting() { CloseAllPanels(); if (settingPanel != null) settingPanel.SetActive(true); }
+    public void OpenInformation() { CloseAllPanels(); if (informationPanel != null) informationPanel.SetActive(true); }
+    public void OpenHowToPlay() { CloseAllPanels(); if (howToPlayPanel != null) howToPlayPanel.SetActive(true); }
 
     public void CloseAllPanels()
     {
@@ -146,9 +118,23 @@ public class MainMenuControl : MonoBehaviour
         if (howToPlayPanel != null) howToPlayPanel.SetActive(false);
     }
 
+    // --- ส่วนที่อัปเดตใหม่กวัก! ---
     public void QuitGame()
     {
-        Application.Quit();
+        StartCoroutine(DelayQuit());
+    }
+
+    private IEnumerator DelayQuit()
+    {
+        Debug.Log("รอ 2 วินาทีก่อนปิดเกมกวัก...");
+        yield return new WaitForSeconds(2.0f);
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+
         Debug.Log("กวัก! ออกเกมแล้วนะนาย");
     }
 }
