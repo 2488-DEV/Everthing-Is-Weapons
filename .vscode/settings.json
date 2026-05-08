@@ -67,6 +67,6 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "Everthing Is Weapons.slnx",
+    "dotnet.defaultSolution": "Everthing-Is-Weapons.slnx",
     "dotnet.enableWorkspaceBasedDevelopment": false
 }
