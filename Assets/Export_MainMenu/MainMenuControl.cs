@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering.Universal; // เพิ่มตัวนี้เข้ามาเพื่อใช้ Light 2D
 using System.Collections;
 
 public class MainMenuControl : MonoBehaviour
@@ -23,6 +24,15 @@ public class MainMenuControl : MonoBehaviour
     public Slider sfxSlider;
     public AudioSource sfxSource;
 
+    [Header("Light Control")]
+    public Light2D targetLight;         // ลากดวงไฟ Spot Light มาใส่ตรงนี้
+    public float normalIntensity = 5.0f;
+    public float hoverIntensity = 0.5f;
+    public float lightFadeSpeed = 5.0f;
+
+    private bool isProcessing = false;  // ป้องกันการกดปุ่มซ้ำซ้อน
+    private Coroutine lightFadeRoutine;
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -39,6 +49,7 @@ public class MainMenuControl : MonoBehaviour
 
     void Start()
     {
+        // โหลดค่าระดับเสียง BGM
         float savedBgm = PlayerPrefs.GetFloat("BGMVolume", 0.5f);
         if (bgmSlider != null)
         {
@@ -47,6 +58,7 @@ public class MainMenuControl : MonoBehaviour
         }
         SetBGMVolume(bgmSlider != null ? bgmSlider.value : 1f);
 
+        // โหลดค่าระดับเสียง SFX
         float savedSfx = PlayerPrefs.GetFloat("SFXVolume", 0.8f);
         if (sfxSlider != null)
         {
@@ -59,30 +71,78 @@ public class MainMenuControl : MonoBehaviour
         AudioListener.volume = 1.0f;
     }
 
-    public void StartWithDelay(string sceneName)
-    {
-        StartCoroutine(DelaySceneLoad(sceneName));
-    }
+    // --- ระบบ Delay 1 วินาทีก่อนทำงาน ---
 
-    private IEnumerator DelaySceneLoad(string sceneName)
-    {
-        if (string.IsNullOrEmpty(sceneName))
-        {
-            Debug.LogError("นายลืมพิมพ์ชื่อ Scene กวัก?!");
-            yield break;
-        }
-        yield return new WaitForSeconds(2.0f);
-        SceneManager.LoadScene(sceneName);
-    }
+    public void OpenSetting() => StartCoroutine(DelayAction(() => {
+        CloseAllPanels();
+        if (settingPanel != null) settingPanel.SetActive(true);
+    }));
 
-    public void LoadTargetScene(string sceneName)
-    {
+    public void OpenInformation() => StartCoroutine(DelayAction(() => {
+        CloseAllPanels();
+        if (informationPanel != null) informationPanel.SetActive(true);
+    }));
+
+    public void OpenHowToPlay() => StartCoroutine(DelayAction(() => {
+        CloseAllPanels();
+        if (howToPlayPanel != null) howToPlayPanel.SetActive(true);
+    }));
+
+    public void StartGame(string sceneName) => StartCoroutine(DelayAction(() => {
         if (!string.IsNullOrEmpty(sceneName)) SceneManager.LoadScene(sceneName);
+    }));
+
+    public void QuitGame() => StartCoroutine(DelayAction(() => {
+        Debug.Log("กวัก! ออกเกมแล้วนะนาย");
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+    }));
+
+    private IEnumerator DelayAction(System.Action action)
+    {
+        if (isProcessing) yield break;
+        isProcessing = true;
+
+        yield return new WaitForSeconds(1.0f); // ดีเลย์ 1 วิ ตามที่ขอ
+
+        action?.Invoke();
+        isProcessing = false;
     }
 
-    public void PlayCustomSound(AudioClip clip)
+    // --- ระบบแสง (ทำงานทันทีที่เมาส์ชี้) ---
+
+    public void OnHoverStartButton() // เอาไปผูกกับ Event Trigger [Pointer Enter]
     {
-        if (sfxSource != null && clip != null) sfxSource.PlayOneShot(clip);
+        if (lightFadeRoutine != null) StopCoroutine(lightFadeRoutine);
+        lightFadeRoutine = StartCoroutine(FadeLight(hoverIntensity));
+    }
+
+    public void OnExitStartButton() // เอาไปผูกกับ Event Trigger [Pointer Exit]
+    {
+        if (lightFadeRoutine != null) StopCoroutine(lightFadeRoutine);
+        lightFadeRoutine = StartCoroutine(FadeLight(normalIntensity));
+    }
+
+    private IEnumerator FadeLight(float target)
+    {
+        if (targetLight == null) yield break;
+        while (!Mathf.Approximately(targetLight.intensity, target))
+        {
+            targetLight.intensity = Mathf.MoveTowards(targetLight.intensity, target, lightFadeSpeed * Time.deltaTime);
+            yield return null;
+        }
+    }
+
+    // --- ระบบพื้นฐานอื่นๆ ---
+
+    public void CloseAllPanels()
+    {
+        if (settingPanel != null) settingPanel.SetActive(false);
+        if (informationPanel != null) informationPanel.SetActive(false);
+        if (howToPlayPanel != null) howToPlayPanel.SetActive(false);
     }
 
     public void SetBGMVolume(float sliderValue)
@@ -107,34 +167,8 @@ public class MainMenuControl : MonoBehaviour
         PlayerPrefs.SetFloat("SFXVolume", sliderValue);
     }
 
-    public void OpenSetting() { CloseAllPanels(); if (settingPanel != null) settingPanel.SetActive(true); }
-    public void OpenInformation() { CloseAllPanels(); if (informationPanel != null) informationPanel.SetActive(true); }
-    public void OpenHowToPlay() { CloseAllPanels(); if (howToPlayPanel != null) howToPlayPanel.SetActive(true); }
-
-    public void CloseAllPanels()
+    public void PlayCustomSound(AudioClip clip)
     {
-        if (settingPanel != null) settingPanel.SetActive(false);
-        if (informationPanel != null) informationPanel.SetActive(false);
-        if (howToPlayPanel != null) howToPlayPanel.SetActive(false);
-    }
-
-    // --- ส่วนที่อัปเดตใหม่กวัก! ---
-    public void QuitGame()
-    {
-        StartCoroutine(DelayQuit());
-    }
-
-    private IEnumerator DelayQuit()
-    {
-        Debug.Log("รอ 2 วินาทีก่อนปิดเกมกวัก...");
-        yield return new WaitForSeconds(2.0f);
-
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
-
-        Debug.Log("กวัก! ออกเกมแล้วนะนาย");
+        if (sfxSource != null && clip != null) sfxSource.PlayOneShot(clip);
     }
 }
