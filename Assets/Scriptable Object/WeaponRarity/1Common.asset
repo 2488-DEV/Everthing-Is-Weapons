@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rarityName: Common
   rarityDamage: 0
-  rarityDurability: 100
+  rarityDurability: 0
   rarityChance: 50
   rarityColor: {r: 1, g: 1, b: 1, a: 0}

@@ -15,6 +15,8 @@ MonoBehaviour:
   weaponName: Baseball Bat
   baseDamage: 5
   baseDurability: 250
-  weaponType: {fileID: 11400000, guid: b415ee110f30be5409c2378f4c1bc2e7, type: 2}
   weaponRarity: {fileID: 11400000, guid: 062cbe3740293084792ed6de78e2a4b3, type: 2}
-  itemModel: {fileID: 2771664849551918302, guid: d0a309567ab040d42a7e77478ef00f23, type: 3}
+  itemModel: {fileID: -3318833251746928292, guid: d0a309567ab040d42a7e77478ef00f23, type: 3}
+  weaponType: 0
+  attackSpeed: 0.8
+  attackReach: 2.5

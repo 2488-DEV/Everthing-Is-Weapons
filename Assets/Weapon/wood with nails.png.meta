@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: d0a309567ab040d42a7e77478ef00f23
+guid: 3b5c5eac191ac6347967462b2711e2bc
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3318833251746928292
-    second: baseball bat_0
+      213: -7198855324491236001
+    second: wood with nails_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: baseball bat_0
+      name: wood with nails_0
       rect:
         serializedVersion: 2
-        x: 127
+        x: 128
         y: 42
-        width: 51
-        height: 227
+        width: 45
+        height: 216
       alignment: 9
-      pivot: {x: 0.49308357, y: 0.19388315}
+      pivot: {x: 0.44513008, y: 0.18482593}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c59aed0ddb221f1d0800000000000000
-      internalID: -3318833251746928292
+      spriteID: f5d354a3937881c90800000000000000
+      internalID: -7198855324491236001
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 6d4d32be07d731947a2b4ab6822044f9
+    spriteID: 6c7d26f6922bfc14598415590f5a8549
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      baseball bat_0: -3318833251746928292
+      wood with nails_0: -7198855324491236001
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: d0a309567ab040d42a7e77478ef00f23
+guid: 0047da5b55dd97842bffc0b255b8dc8d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3318833251746928292
-    second: baseball bat_0
+      213: -4212027707405927793
+    second: laptop_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: baseball bat_0
+      name: laptop_0
       rect:
         serializedVersion: 2
-        x: 127
-        y: 42
-        width: 51
-        height: 227
-      alignment: 9
-      pivot: {x: 0.49308357, y: 0.19388315}
+        x: 93
+        y: 173
+        width: 271
+        height: 249
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c59aed0ddb221f1d0800000000000000
-      internalID: -3318833251746928292
+      spriteID: f8a77fbcd1fdb85c0800000000000000
+      internalID: -4212027707405927793
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 6d4d32be07d731947a2b4ab6822044f9
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      baseball bat_0: -3318833251746928292
+      laptop_0: -4212027707405927793
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

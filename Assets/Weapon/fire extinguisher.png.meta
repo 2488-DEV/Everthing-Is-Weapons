@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: d0a309567ab040d42a7e77478ef00f23
+guid: d5bd3b51cc851bb4faae9acc42b77d42
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3318833251746928292
-    second: baseball bat_0
+      213: -8484649762253749636
+    second: fire extinguisher_0
+  - first:
+      213: -1311884796633667003
+    second: fire extinguisher_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +103,45 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: baseball bat_0
+      name: fire extinguisher_0
       rect:
         serializedVersion: 2
-        x: 127
-        y: 42
-        width: 51
-        height: 227
-      alignment: 9
-      pivot: {x: 0.49308357, y: 0.19388315}
+        x: 82
+        y: 136
+        width: 128
+        height: 220
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c59aed0ddb221f1d0800000000000000
-      internalID: -3318833251746928292
+      spriteID: c72434daef7704a80800000000000000
+      internalID: -8484649762253749636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fire extinguisher_1
+      rect:
+        serializedVersion: 2
+        x: 257
+        y: 247
+        width: 79
+        height: 79
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54a2a666abf3bcde0800000000000000
+      internalID: -1311884796633667003
       vertices: []
       indices: 
       edges: []
@@ -125,7 +150,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 6d4d32be07d731947a2b4ab6822044f9
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +160,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      baseball bat_0: -3318833251746928292
+      fire extinguisher_0: -8484649762253749636
+      fire extinguisher_1: -1311884796633667003
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

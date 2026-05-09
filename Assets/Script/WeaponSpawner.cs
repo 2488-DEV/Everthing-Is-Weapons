@@ -15,10 +15,18 @@ public class WeaponSpawner : MonoBehaviour
 
     void SpawnWeapon()
     {
+        // 1. เช็กดวงก่อนเลย (Random.value จะคืนค่า 0.0 ถึง 1.0)
+        // ถ้า 0.3 หมายถึง 30% ถ้าสุ่มได้เลขที่น้อยกว่าหรือเท่ากับ 0.3 ก็ให้หยุดทำงานทันที
+        if (Random.value <= 0.3f) 
+        {
+            Debug.Log("<color=red>เสียใจด้วย!</color> จุดนี้สุ่มไม่ได้ของ");
+            return; 
+        }
+    
+        // 2. ถ้าผ่านดวง 70% มาได้ ถึงจะเริ่มรันโค้ดส่วนที่เหลือของเจมส์
         if (weaponPool.Length == 0 || rarityPool.Length == 0 || itemPrefab == null) return;
-
+    
         WeaponRarity selectedRarity = GetWeightedRarity();
-
         WeaponInfo baseWeapon = weaponPool[Random.Range(0, weaponPool.Length)];
 
         if (baseWeapon != null && selectedRarity != null)
@@ -36,11 +44,12 @@ public class WeaponSpawner : MonoBehaviour
 
     WeaponRarity GetWeightedRarity()
     {
-        float totalChance = 0;
-
+        float totalChance = 0.5f;
+        
         foreach (WeaponRarity r in rarityPool) 
         {
             totalChance += r.rarityChance;
+            Debug.Log(totalChance);
         }
 
         float randomPoint = Random.Range(0, totalChance);
@@ -54,6 +63,6 @@ public class WeaponSpawner : MonoBehaviour
                 return r;
             }
         }
-        return rarityPool[0]; // 
+        return rarityPool[0];
     }
 }

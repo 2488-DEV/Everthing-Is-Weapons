@@ -1,10 +1,16 @@
 fileFormatVersion: 2
-guid: d0a309567ab040d42a7e77478ef00f23
+guid: f1d412cd3abb7964e98cd69282cdb11a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3318833251746928292
-    second: baseball bat_0
+      213: -1875039398657475027
+    second: black guy_0
+  - first:
+      213: 9159886069550649499
+    second: black guy_1
+  - first:
+      213: -8166936171628584809
+    second: black guy_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +106,67 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: baseball bat_0
+      name: black guy_0
       rect:
         serializedVersion: 2
-        x: 127
-        y: 42
-        width: 51
-        height: 227
-      alignment: 9
-      pivot: {x: 0.49308357, y: 0.19388315}
+        x: 36
+        y: 239
+        width: 98
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c59aed0ddb221f1d0800000000000000
-      internalID: -3318833251746928292
+      spriteID: d2eb82fe9958af5e0800000000000000
+      internalID: -1875039398657475027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: black guy_1
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 123
+        width: 147
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b909d9e59d37e1f70800000000000000
+      internalID: 9159886069550649499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: black guy_2
+      rect:
+        serializedVersion: 2
+        x: 383
+        y: 199
+        width: 99
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7902aca72d639ae80800000000000000
+      internalID: -8166936171628584809
       vertices: []
       indices: 
       edges: []
@@ -125,7 +175,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 6d4d32be07d731947a2b4ab6822044f9
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +185,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      baseball bat_0: -3318833251746928292
+      black guy_0: -1875039398657475027
+      black guy_1: 9159886069550649499
+      black guy_2: -8166936171628584809
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

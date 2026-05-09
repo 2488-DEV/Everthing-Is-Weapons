@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f721259cbfa7264da704c2325b09052, type: 3}
-  m_Name: T-Square
+  m_Name: Axe
   m_EditorClassIdentifier: 
-  weaponName: T-Square
-  baseDamage: 7
+  weaponName: Axe
+  baseDamage: 9
   baseDurability: 250
   weaponRarity: {fileID: 11400000, guid: 062cbe3740293084792ed6de78e2a4b3, type: 2}
-  itemModel: {fileID: 6648473643129340828, guid: 2b4ddb409cb57144b8831b27559b02ac, type: 3}
+  itemModel: {fileID: 6674386295937086461, guid: caea7e1e3860bea4f9c8195cadf63575, type: 3}
   weaponType: 0
-  attackSpeed: 1
+  attackSpeed: 1.5
   attackReach: 3.5

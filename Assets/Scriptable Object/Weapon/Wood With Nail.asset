@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f721259cbfa7264da704c2325b09052, type: 3}
-  m_Name: T-Square
+  m_Name: Wood With Nail
   m_EditorClassIdentifier: 
-  weaponName: T-Square
-  baseDamage: 7
-  baseDurability: 250
+  weaponName: Wood With Nail
+  baseDamage: 8
+  baseDurability: 100
   weaponRarity: {fileID: 11400000, guid: 062cbe3740293084792ed6de78e2a4b3, type: 2}
-  itemModel: {fileID: 6648473643129340828, guid: 2b4ddb409cb57144b8831b27559b02ac, type: 3}
+  itemModel: {fileID: -7198855324491236001, guid: 3b5c5eac191ac6347967462b2711e2bc, type: 3}
   weaponType: 0
-  attackSpeed: 1
-  attackReach: 3.5
+  attackSpeed: 1.25
+  attackReach: 2.5

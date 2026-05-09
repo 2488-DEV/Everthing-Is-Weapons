@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: d0a309567ab040d42a7e77478ef00f23
+guid: 53b405ae67e942746b473cbdd0aa14ed
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3318833251746928292
-    second: baseball bat_0
+      213: 6737724048487822203
+    second: man_0
+  - first:
+      213: -6102451206531921958
+    second: man_1
+  - first:
+      213: -9063596418544571488
+    second: man_2
+  - first:
+      213: 8238122796709039737
+    second: man_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +109,89 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: baseball bat_0
+      name: man_0
       rect:
         serializedVersion: 2
-        x: 127
-        y: 42
-        width: 51
-        height: 227
-      alignment: 9
-      pivot: {x: 0.49308357, y: 0.19388315}
+        x: 146
+        y: 242
+        width: 42
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c59aed0ddb221f1d0800000000000000
-      internalID: -3318833251746928292
+      spriteID: b7339b8f254318d50800000000000000
+      internalID: 6737724048487822203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: man_1
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 151
+        width: 132
+        height: 272
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad7c287b5fcbf4ba0800000000000000
+      internalID: -6102451206531921958
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: man_2
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 122
+        width: 37
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0abe52d0413a73280800000000000000
+      internalID: -9063596418544571488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: man_3
+      rect:
+        serializedVersion: 2
+        x: 261
+        y: 112
+        width: 43
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97ec3e14901b35270800000000000000
+      internalID: 8238122796709039737
       vertices: []
       indices: 
       edges: []
@@ -125,7 +200,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 6d4d32be07d731947a2b4ab6822044f9
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +210,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      baseball bat_0: -3318833251746928292
+      man_0: 6737724048487822203
+      man_1: -6102451206531921958
+      man_2: -9063596418544571488
+      man_3: 8238122796709039737
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

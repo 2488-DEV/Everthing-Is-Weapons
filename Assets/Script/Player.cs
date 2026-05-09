@@ -4,6 +4,7 @@ public class Player : MonoBehaviour
 {
     public Transform handTransform;
     public Transform weaponHandler;
+    public Transform HitBox;
     public SpriteRenderer[] characterParts;
     public Rigidbody2D rb;
     public Vector2 moveInput;
@@ -16,7 +17,10 @@ public class Player : MonoBehaviour
     private SpriteRenderer weaponSR;
     public float attackTime;
     public float attackTimer;
-
+    private float baseAngle;
+    private bool isMouseOnLeft;
+    private float mousePos;
+    private float shootTargetPos;
     private bool weaponInRange = false;
     void Start()
     {
@@ -37,22 +41,9 @@ public class Player : MonoBehaviour
         moveInput = moveInput.normalized;
 
         HandleFlipAndMovementLogic();
-
-        if (weaponHandlerScript.currentWeapon != null)
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                Attack();
-                if (attackTimer <= 0)
-                {
-                    attackTimer = attackTime;
-                }
-            } 
-            if (attackTimer > 0)
-            {
-                attackTimer -= Time.deltaTime;
-            }
-        }
+        
+        
+        Attack();
 
         if (weaponInRange && Input.GetKeyDown(KeyCode.E))
         {
@@ -60,6 +51,19 @@ public class Player : MonoBehaviour
         }
     }
 
+    float GetMouseAngle()
+    {
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    
+        // 2. หาทางต่างระหว่าง ตำแหน่งเมาส์ กับ ตำแหน่งแขน (Pivot)
+        // เราใช้ z = 0 เพื่อให้การคำนวณใน 2D แม่นยำที่สุด
+        Vector3 direction = mousePos - handTransform.position;
+        direction.z = 0;
+        // 3. ใช้ Atan2 เพื่อหาองศา (มันจะคืนค่าเป็น Radian เลยต้องคูณ Rad2Deg เพื่อเปลี่ยนเป็นองศา 0-360)
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        return angle;
+
+    }
     void Pickup()
     {
         if (weaponNew == null) return;
@@ -77,7 +81,10 @@ public class Player : MonoBehaviour
 
         // 3. เอาของจากพื้นขึ้นมือ (พร้อมค่าความทนทานของมัน)
         weaponHandlerScript.SetWeapon(groundData, groundRarity, groundDurability);
-        attackTime = weaponHandlerScript.currentWeapon.AttackSpeed;
+        attackTime = weaponHandlerScript.currentWeapon.attackSpeed;
+
+        Debug.Log(weaponHandlerScript.currentWeapon.attackReach);
+        HitBox.localScale = new Vector3(0.5f , weaponHandlerScript.currentWeapon.attackReach/1.2f , 0.5f);
         if (handData != null)
         {
             // 4. เอาของจากมือลงพื้น (พร้อมค่าความทนทานที่ใช้ไปแล้ว)
@@ -92,25 +99,67 @@ public class Player : MonoBehaviour
     {   
         if (weaponHandlerScript.currentWeapon != null && weaponHandlerScript.currentRarity != null)
         {
-            if (attackTimer <= 0)
+            if (weaponHandlerScript.currentWeapon.weaponType == WeaponInfo.WeaponType.Melee)
             {
-                string wName = weaponHandlerScript.currentWeapon.weaponName;
-                float finalDmg = weaponHandlerScript.currentWeapon.baseDamage + weaponHandlerScript.currentRarity.rarityDamage;
-                string rName = weaponHandlerScript.currentRarity.rarityName; // สมมติว่ามีชื่อใน SO
+                if (Input.GetMouseButtonDown(0))
+                {   
+                    if (attackTimer <= 0)
+                    {
+                        HitBox.gameObject.SetActive(true);
+                        attackTimer = attackTime;
+                        baseAngle = GetMouseAngle();
 
-                // 2. ลดความทนทาน (ถ้าพัง currentWeapon จะกลายเป็น null ในบรรทัดนี้)
-                float durabilityCost = 10f;
-                weaponHandlerScript.DecreaseDurability(durabilityCost);
+                        string wName = weaponHandlerScript.currentWeapon.weaponName;
+                        float finalDmg = weaponHandlerScript.currentWeapon.baseDamage + weaponHandlerScript.currentRarity.rarityDamage;
+                        string rName = weaponHandlerScript.currentRarity.rarityName; // สมมติว่ามีชื่อใน SO
 
-                // 3. แสดงผลโดยใช้ตัวแปรที่เราจดไว้ (ไม่ไปดึงจาก currentWeapon โดยตรงแล้ว)
-                // ใช้ string.Format หรือ interpolation จะอ่านง่ายขึ้นครับเจมส์
-                Debug.Log($"ตีด้วย {wName} | ความแรงรวม: {finalDmg} | ระดับ: {rName} | ความเร็วโจมตี: {weaponHandlerScript.currentWeapon.AttackSpeed} |ความคงทนเหลือ: {weaponHandlerScript.currentDurability}");
+                        // 2. ลดความทนทาน (ถ้าพัง currentWeapon จะกลายเป็น null ในบรรทัดนี้)
+                        float durabilityCost = 10f;
+                        weaponHandlerScript.DecreaseDurability(durabilityCost);
 
-                // 4. เช็กเสริมเผื่ออยากรู้ว่าพังหรือยัง
-                if (weaponHandlerScript.currentWeapon == null)
+                        // 3. แสดงผลโดยใช้ตัวแปรที่เราจดไว้ (ไม่ไปดึงจาก currentWeapon โดยตรงแล้ว)
+                        // ใช้ string.Format หรือ interpolation จะอ่านง่ายขึ้นครับเจมส์
+                        Debug.Log($"ตีด้วย {wName} | ความแรงรวม: {finalDmg} | ระดับ: {rName} | ความเร็วโจมตี: {weaponHandlerScript.currentWeapon.attackSpeed} |ความคงทนเหลือ: {weaponHandlerScript.currentDurability}");
+
+                        // 4. เช็กเสริมเผื่ออยากรู้ว่าพังหรือยัง
+                        if (weaponHandlerScript.currentWeapon == null)
+                        {
+                            Debug.Log("--- อาวุธพังคามือเรียบร้อย! ---");
+                        }
+                    }
+                } 
+                if (attackTimer > 0)
                 {
-                    Debug.Log("--- อาวุธพังคามือเรียบร้อย! ---");
+                    attackTimer -= Time.deltaTime;
                 }
+                 // ฟังก์ชันที่เจมส์ใช้คำนวณองศาเมาส์
+
+                if (isMouseOnLeft)
+                {
+                    if (attackTimer > 0)
+                    {   
+                        float progress = attackTimer / attackTime;
+                        float startOffset = -45f - 180f;
+                        float endOffset = 90f - 180f;
+                        float currentOffset = Mathf.Lerp(endOffset, startOffset, progress);
+                        handTransform.localRotation = Quaternion.Euler(0, 0, baseAngle + currentOffset);
+                    }
+                }
+                else if (!isMouseOnLeft)
+                {
+                    if (attackTimer > 0)
+                    {   
+                        float progress = attackTimer / attackTime;
+                        float startOffset = 45f;
+                        float endOffset = -90f;
+                        float currentOffset = Mathf.Lerp(endOffset, startOffset, progress);
+                        handTransform.localRotation = Quaternion.Euler(0, 0, baseAngle + currentOffset);
+                    }
+                }
+            }
+            else if (weaponHandlerScript.currentWeapon.weaponType == WeaponInfo.WeaponType.Range)
+            {
+
             }
         }
     }
@@ -119,11 +168,14 @@ public class Player : MonoBehaviour
         Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
         Vector3 direction = mousePos - handTransform.position;
         
-        bool isMouseOnLeft = mousePos.x < transform.position.x;
+        
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
+        
+        Debug.Log(isMouseOnLeft);
         if (attackTimer <= 0)
-        {
+        {   
+            HitBox.gameObject.SetActive(false);
+            isMouseOnLeft = mousePos.x < transform.position.x;
             if (isMouseOnLeft)
             {
                 handTransform.rotation = Quaternion.Euler(0, 0, angle + 180f);
@@ -132,6 +184,7 @@ public class Player : MonoBehaviour
                 if (weaponHandler.localPosition.x > 0)
                 {
                     weaponHandler.localPosition = new Vector3(-weaponHandler.localPosition.x, weaponHandler.localPosition.y, weaponHandler.localPosition.z);
+                    HitBox.localPosition = new Vector3(-HitBox.localPosition.x, HitBox.localPosition.y, HitBox.localPosition.z);
                 }
             }   
             else
@@ -142,6 +195,7 @@ public class Player : MonoBehaviour
                 if (weaponHandler.localPosition.x < 0)
                 {
                     weaponHandler.localPosition = new Vector3(-weaponHandler.localPosition.x, weaponHandler.localPosition.y, weaponHandler.localPosition.z);
+                    HitBox.localPosition = new Vector3(-HitBox.localPosition.x, HitBox.localPosition.y, HitBox.localPosition.z);
                 }
             }
 
@@ -207,7 +261,7 @@ public class Player : MonoBehaviour
                 Debug.Log("เจอไอเทม: " + item.weaponData.weaponName + 
           "\nระดับความหายาก: " + item.weaponRarity.rarityName + 
           "\nดาเมจรวม: " + item.FinalDamage + 
-          "\nความเร็วรวม: " + item.weaponData.AttackSpeed);
+          "\nความเร็วรวม: " + item.weaponData.attackSpeed);
 
                 weaponInRange = true;
                 weaponNew = item;
