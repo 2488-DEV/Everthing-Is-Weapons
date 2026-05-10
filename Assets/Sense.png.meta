@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: eb7bef3c86a7f58458fa093cf7b5d391
+guid: c5f3cc5a087cd0340ab4b2faa4b8ff6a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1469909079130451432
-    second: paper_0
+      213: -798082215398727774
+    second: Sense_0
+  - first:
+      213: -7433121861757125409
+    second: Sense_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +40,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -75,7 +78,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,23 +103,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: paper_0
+      name: Sense_0
       rect:
         serializedVersion: 2
-        x: 193
-        y: 233
-        width: 96
-        height: 86
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 90
+        y: 79
+        width: 18
+        height: 57
+      alignment: 9
+      pivot: {x: 0.5261277, y: -0.19309087}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 812de4efa75d99be0800000000000000
-      internalID: -1469909079130451432
+      spriteID: 2af1a991474ace4f0800000000000000
+      internalID: -798082215398727774
       vertices: []
       indices: 
       edges: []
@@ -125,7 +128,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: c02c98394d25eb84aa43c72c36bb6091
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +138,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      paper_0: -1469909079130451432
+      Sense_0: -798082215398727774
+      Sense_1: -7433121861757125409
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

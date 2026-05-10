@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Player : MonoBehaviour
 {
@@ -15,6 +16,10 @@ public class Player : MonoBehaviour
     private Camera mainCam; 
     private SpriteRenderer handSR;
     private SpriteRenderer weaponSR;
+
+    [Header("PlayerStat")]
+    public float health = 100;
+    public float attackDamage;
     public float attackTime;
     public float attackTimer;
     private float baseAngle;
@@ -22,6 +27,7 @@ public class Player : MonoBehaviour
     private float mousePos;
     private float shootTargetPos;
     private bool weaponInRange = false;
+    public float knockbackForce = 2000f;
     void Start()
     {
         mainCam = Camera.main; 
@@ -51,6 +57,29 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void ApplyKnockback(Vector3 attackerPos, float force, float duration) 
+    {
+        // คำนวณทิศทาง (จากคนตี -> มาที่ตัว Player)
+        Vector2 direction = (transform.position - attackerPos).normalized;
+        Vector2 targetPos = (Vector2)transform.position + (direction * force);
+        
+        // สั่งให้เริ่มการขยับแบบ Lerp (เจมส์ต้องมี Coroutine นี้ด้วยนะ)
+        StartCoroutine(PlayerKnockbackLerp(targetPos, duration));
+    }
+    
+    IEnumerator PlayerKnockbackLerp(Vector2 target, float duration)
+    {
+        float time = 0;
+        Vector2 startPos = transform.position;
+    
+        while (time < duration)
+        {
+            transform.position = Vector2.Lerp(startPos, target, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = target;
+    }
     float GetMouseAngle()
     {
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -82,6 +111,7 @@ public class Player : MonoBehaviour
         // 3. เอาของจากพื้นขึ้นมือ (พร้อมค่าความทนทานของมัน)
         weaponHandlerScript.SetWeapon(groundData, groundRarity, groundDurability);
         attackTime = weaponHandlerScript.currentWeapon.attackSpeed;
+        attackDamage = weaponHandlerScript.currentWeapon.baseDamage + weaponHandlerScript.currentRarity.rarityDamage;;
 
         Debug.Log(weaponHandlerScript.currentWeapon.attackReach);
         HitBox.localScale = new Vector3(0.5f , weaponHandlerScript.currentWeapon.attackReach/1.2f , 0.5f);

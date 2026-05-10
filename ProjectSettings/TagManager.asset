@@ -5,7 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Weapon
-  - Door
+  - PlayerAttackHitBox
   layers:
   - Default
   - TransparentFX

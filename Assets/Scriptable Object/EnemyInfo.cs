@@ -7,4 +7,7 @@ public class EnemyInfo : ScriptableObject
     public float speed;
     public float attackDamage;
     public Sprite enemyModel;
+    public float senseLocate;
+    public float attackSpeed;
+    public float attackReach;
 }
