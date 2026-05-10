@@ -25,7 +25,6 @@ public class Player : MonoBehaviour
     private float baseAngle;
     private bool isMouseOnLeft;
     private float mousePos;
-    private float shootTargetPos;
     private bool weaponInRange = false;
     public float knockbackForce = 2000f;
     void Start()

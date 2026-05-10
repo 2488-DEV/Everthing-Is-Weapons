@@ -44,6 +44,10 @@ public class BaseEnemy : MonoBehaviour
 
     void Update()
     {   
+        if (player.attackTimer <= 0)
+        {
+            isGettingHit = false;
+        }
         HealthUpdate();
         if (attackTimer > 0)
         {
@@ -86,6 +90,7 @@ public class BaseEnemy : MonoBehaviour
             this.gameObject.SetActive(false);
         }
     }
+
     void MoveTowardsPlayer()
     {
         float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
@@ -162,14 +167,6 @@ public class BaseEnemy : MonoBehaviour
                     ApplyKnockback(collision.transform.position);
                 }
             }
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision) 
-    {
-        if (collision.gameObject.CompareTag("PlayerAttackHitBox"))
-        {
-            isGettingHit = false;
         }
     }
 }
