@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f721259cbfa7264da704c2325b09052, type: 3}
+  m_Name: T-Square
+  m_EditorClassIdentifier: 
+  weaponName: T-Square
+  baseDamage: 7
+  baseDurability: 250
+  weaponRarity: {fileID: 11400000, guid: 062cbe3740293084792ed6de78e2a4b3, type: 2}
+  itemModel: {fileID: 6648473643129340828, guid: 2b4ddb409cb57144b8831b27559b02ac, type: 3}
+  weaponType: 0
+  attackSpeed: 1
+  attackReach: 3.5

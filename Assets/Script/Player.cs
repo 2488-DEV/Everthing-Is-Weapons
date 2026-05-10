@@ -1,0 +1,280 @@
+using UnityEngine;
+
+public class Player : MonoBehaviour
+{
+    public Transform handTransform;
+    public Transform weaponHandler;
+    public Transform HitBox;
+    public SpriteRenderer[] characterParts;
+    public Rigidbody2D rb;
+    public Vector2 moveInput;
+    public Animator animator;
+    public WeaponHandler weaponHandlerScript;
+    public ItemPickup weaponNew;
+    public float speed = 5f;
+    private Camera mainCam; 
+    private SpriteRenderer handSR;
+    private SpriteRenderer weaponSR;
+    public float attackTime;
+    public float attackTimer;
+    private float baseAngle;
+    private bool isMouseOnLeft;
+    private float mousePos;
+    private float shootTargetPos;
+    private bool weaponInRange = false;
+    void Start()
+    {
+        mainCam = Camera.main; 
+        if (characterParts.Length > 4)
+        {
+            handSR = characterParts[4];
+        }
+
+        weaponSR = weaponHandler.GetComponent<SpriteRenderer>();
+        weaponHandlerScript = weaponHandler.GetComponent<WeaponHandler>();
+    }
+
+    void Update()
+    {
+        moveInput.x = Input.GetAxisRaw("Horizontal");
+        moveInput.y = Input.GetAxisRaw("Vertical");
+        moveInput = moveInput.normalized;
+
+        HandleFlipAndMovementLogic();
+        
+        
+        Attack();
+
+        if (weaponInRange && Input.GetKeyDown(KeyCode.E))
+        {
+            Pickup();
+        }
+    }
+
+    float GetMouseAngle()
+    {
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    
+        // 2. หาทางต่างระหว่าง ตำแหน่งเมาส์ กับ ตำแหน่งแขน (Pivot)
+        // เราใช้ z = 0 เพื่อให้การคำนวณใน 2D แม่นยำที่สุด
+        Vector3 direction = mousePos - handTransform.position;
+        direction.z = 0;
+        // 3. ใช้ Atan2 เพื่อหาองศา (มันจะคืนค่าเป็น Radian เลยต้องคูณ Rad2Deg เพื่อเปลี่ยนเป็นองศา 0-360)
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        return angle;
+
+    }
+    void Pickup()
+    {
+        if (weaponNew == null) return;
+
+        
+        // 1. ดึงค่าจาก "พื้น" มาเตรียมไว้
+        WeaponInfo groundData = weaponNew.weaponData;
+        WeaponRarity groundRarity = weaponNew.weaponRarity;
+        float groundDurability = weaponNew.currentDurability; // ค่าที่พื้นจำไว้
+
+        // 2. จำค่าจาก "มือ" ปัจจุบัน
+        WeaponInfo handData = weaponHandlerScript.currentWeapon;
+        WeaponRarity handRarity = weaponHandlerScript.currentRarity;
+        float handDurability = weaponHandlerScript.currentDurability;
+
+        // 3. เอาของจากพื้นขึ้นมือ (พร้อมค่าความทนทานของมัน)
+        weaponHandlerScript.SetWeapon(groundData, groundRarity, groundDurability);
+        attackTime = weaponHandlerScript.currentWeapon.attackSpeed;
+
+        Debug.Log(weaponHandlerScript.currentWeapon.attackReach);
+        HitBox.localScale = new Vector3(0.5f , weaponHandlerScript.currentWeapon.attackReach/1.2f , 0.5f);
+        if (handData != null)
+        {
+            // 4. เอาของจากมือลงพื้น (พร้อมค่าความทนทานที่ใช้ไปแล้ว)
+            weaponNew.SetWeapon(handData, handRarity, handDurability);
+        }
+        else
+        {
+            Destroy(weaponNew.gameObject);
+        }
+    }
+    void Attack()
+    {   
+        if (weaponHandlerScript.currentWeapon != null && weaponHandlerScript.currentRarity != null)
+        {
+            if (weaponHandlerScript.currentWeapon.weaponType == WeaponInfo.WeaponType.Melee)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {   
+                    if (attackTimer <= 0)
+                    {
+                        HitBox.gameObject.SetActive(true);
+                        attackTimer = attackTime;
+                        baseAngle = GetMouseAngle();
+
+                        string wName = weaponHandlerScript.currentWeapon.weaponName;
+                        float finalDmg = weaponHandlerScript.currentWeapon.baseDamage + weaponHandlerScript.currentRarity.rarityDamage;
+                        string rName = weaponHandlerScript.currentRarity.rarityName; // สมมติว่ามีชื่อใน SO
+
+                        // 2. ลดความทนทาน (ถ้าพัง currentWeapon จะกลายเป็น null ในบรรทัดนี้)
+                        float durabilityCost = 10f;
+                        weaponHandlerScript.DecreaseDurability(durabilityCost);
+
+                        // 3. แสดงผลโดยใช้ตัวแปรที่เราจดไว้ (ไม่ไปดึงจาก currentWeapon โดยตรงแล้ว)
+                        // ใช้ string.Format หรือ interpolation จะอ่านง่ายขึ้นครับเจมส์
+                        Debug.Log($"ตีด้วย {wName} | ความแรงรวม: {finalDmg} | ระดับ: {rName} | ความเร็วโจมตี: {weaponHandlerScript.currentWeapon.attackSpeed} |ความคงทนเหลือ: {weaponHandlerScript.currentDurability}");
+
+                        // 4. เช็กเสริมเผื่ออยากรู้ว่าพังหรือยัง
+                        if (weaponHandlerScript.currentWeapon == null)
+                        {
+                            Debug.Log("--- อาวุธพังคามือเรียบร้อย! ---");
+                        }
+                    }
+                } 
+                if (attackTimer > 0)
+                {
+                    attackTimer -= Time.deltaTime;
+                }
+                 // ฟังก์ชันที่เจมส์ใช้คำนวณองศาเมาส์
+
+                if (isMouseOnLeft)
+                {
+                    if (attackTimer > 0)
+                    {   
+                        float progress = attackTimer / attackTime;
+                        float startOffset = -45f - 180f;
+                        float endOffset = 90f - 180f;
+                        float currentOffset = Mathf.Lerp(endOffset, startOffset, progress);
+                        handTransform.localRotation = Quaternion.Euler(0, 0, baseAngle + currentOffset);
+                    }
+                }
+                else if (!isMouseOnLeft)
+                {
+                    if (attackTimer > 0)
+                    {   
+                        float progress = attackTimer / attackTime;
+                        float startOffset = 45f;
+                        float endOffset = -90f;
+                        float currentOffset = Mathf.Lerp(endOffset, startOffset, progress);
+                        handTransform.localRotation = Quaternion.Euler(0, 0, baseAngle + currentOffset);
+                    }
+                }
+            }
+            else if (weaponHandlerScript.currentWeapon.weaponType == WeaponInfo.WeaponType.Range)
+            {
+
+            }
+        }
+    }
+    void HandleFlipAndMovementLogic()
+    {
+        Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 direction = mousePos - handTransform.position;
+        
+        
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        
+        Debug.Log(isMouseOnLeft);
+        if (attackTimer <= 0)
+        {   
+            HitBox.gameObject.SetActive(false);
+            isMouseOnLeft = mousePos.x < transform.position.x;
+            if (isMouseOnLeft)
+            {
+                handTransform.rotation = Quaternion.Euler(0, 0, angle + 180f);
+                if (handSR != null) handSR.sortingOrder = 3;
+                if (weaponSR != null) weaponSR.sortingOrder = 2;
+                if (weaponHandler.localPosition.x > 0)
+                {
+                    weaponHandler.localPosition = new Vector3(-weaponHandler.localPosition.x, weaponHandler.localPosition.y, weaponHandler.localPosition.z);
+                    HitBox.localPosition = new Vector3(-HitBox.localPosition.x, HitBox.localPosition.y, HitBox.localPosition.z);
+                }
+            }   
+            else
+            {
+                handTransform.rotation = Quaternion.Euler(0, 0, angle);
+                if (handSR != null) handSR.sortingOrder = -2;
+                if (weaponSR != null) weaponSR.sortingOrder = -1;
+                if (weaponHandler.localPosition.x < 0)
+                {
+                    weaponHandler.localPosition = new Vector3(-weaponHandler.localPosition.x, weaponHandler.localPosition.y, weaponHandler.localPosition.z);
+                    HitBox.localPosition = new Vector3(-HitBox.localPosition.x, HitBox.localPosition.y, HitBox.localPosition.z);
+                }
+            }
+
+            foreach (SpriteRenderer part in characterParts)
+            {
+                if (part != null)
+                {
+                    part.flipX = isMouseOnLeft;
+                }
+            }
+        }
+
+        
+
+        float currentSpeed = speed;
+        bool isBackstepping = false;        
+
+        if (moveInput.x != 0)
+        {
+            if (isMouseOnLeft)
+            {
+                if (moveInput.x > 0)
+                {
+                    isBackstepping = false;
+                    currentSpeed = speed * 0.5f;
+                }
+                else if (moveInput.x < 0)
+                {
+                    isBackstepping = true;
+                    currentSpeed = speed;
+                }
+            }
+            else if (!isMouseOnLeft)
+            {   
+                if (moveInput.x > 0)
+                {
+                    isBackstepping = false;
+                    currentSpeed = speed;
+                }
+                else if (moveInput.x < 0)
+                {
+                    isBackstepping = true;
+                    currentSpeed = speed * 0.5f;
+                }
+            }
+        }
+
+        animator.SetBool("isMove", moveInput != Vector2.zero);
+        animator.SetBool("isBackstep", isBackstepping);
+
+        
+        rb.linearVelocity = moveInput * currentSpeed;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision) 
+    {
+        if (collision.gameObject.CompareTag("Weapon"))
+        {
+            ItemPickup item = collision.gameObject.GetComponent<ItemPickup>();
+
+            if (item != null && item.weaponData != null)
+            {
+                Debug.Log("เจอไอเทม: " + item.weaponData.weaponName + 
+          "\nระดับความหายาก: " + item.weaponRarity.rarityName + 
+          "\nดาเมจรวม: " + item.FinalDamage + 
+          "\nความเร็วรวม: " + item.weaponData.attackSpeed);
+
+                weaponInRange = true;
+                weaponNew = item;
+            }
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Weapon"))
+        {
+            weaponInRange = false;
+            weaponNew = null;
+        }
+    }
+}
