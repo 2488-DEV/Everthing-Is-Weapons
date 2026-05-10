@@ -4760,7 +4760,7 @@ MonoBehaviour:
   spotHover: 0.5
   globalNormal: 0.7
   globalHover: 0.1
-  fadeDuration: 1.5
+  fadeDuration: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

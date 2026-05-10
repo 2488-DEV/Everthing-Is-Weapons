@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Weapon
   - PlayerAttackHitBox
+  - Door
   layers:
   - Default
   - TransparentFX
