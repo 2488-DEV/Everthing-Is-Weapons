@@ -62,18 +62,35 @@ public class MainMenuControl : MonoBehaviour
 
     // --- [SOUND SYSTEM] ---
 
-    // ใช้สำหรับเสียงคลิก (OnClick) หรือเสียงกด Handle Slider
     public void PlayClickSound(AudioClip clip)
     {
         if (sfxSource != null && clip != null)
             sfxSource.PlayOneShot(clip);
     }
 
-    // ใช้สำหรับเสียงตอนเอาเมาส์ไปชี้ปุ่ม (Hover)
+    // --- กลับมาเป็นปกติสำหรับปุ่มอื่นๆ (ไม่มีดีเลย์) ---
     public void PlayHoverSound(AudioClip clip)
     {
         if (sfxSource != null && clip != null)
             sfxSource.PlayOneShot(clip);
+    }
+
+    // --- ระบบพิเศษสำหรับปุ่ม Start เท่านั้น ---
+    public void PlayHoverSoundStart(AudioClip clip)
+    {
+        if (sfxSource == null || clip == null) return;
+
+        sfxSource.clip = clip;
+        sfxSource.loop = false;
+        sfxSource.Play();
+    }
+
+    public void StopHoverSound()
+    {
+        if (sfxSource != null)
+        {
+            sfxSource.Stop();
+        }
     }
 
     // --- [LIGHT SYSTEM] ---
@@ -103,30 +120,10 @@ public class MainMenuControl : MonoBehaviour
     }
 
     // --- [BUTTON FUNCTIONS] ---
-
-    public void OpenSetting()
-    {
-        CloseAllPanels();
-        if (settingPanel != null) settingPanel.SetActive(true);
-    }
-
-    public void OpenInformation()
-    {
-        CloseAllPanels();
-        if (informationPanel != null) informationPanel.SetActive(true);
-    }
-
-    public void OpenHowToPlay()
-    {
-        CloseAllPanels();
-        if (howToPlayPanel != null) howToPlayPanel.SetActive(true);
-    }
-
-    public void StartGame(string sceneName)
-    {
-        if (!string.IsNullOrEmpty(sceneName))
-            SceneManager.LoadScene(sceneName);
-    }
+    public void OpenSetting() { CloseAllPanels(); if (settingPanel != null) settingPanel.SetActive(true); }
+    public void OpenInformation() { CloseAllPanels(); if (informationPanel != null) informationPanel.SetActive(true); }
+    public void OpenHowToPlay() { CloseAllPanels(); if (howToPlayPanel != null) howToPlayPanel.SetActive(true); }
+    public void StartGame(string sceneName) { if (!string.IsNullOrEmpty(sceneName)) SceneManager.LoadScene(sceneName); }
 
     public void QuitGame()
     {
@@ -138,27 +135,17 @@ public class MainMenuControl : MonoBehaviour
     }
 
     // --- [AUDIO SETUP & MIXER] ---
-
     private void SetupAudio()
     {
         float savedBgm = PlayerPrefs.GetFloat("BGMVolume", 0.5f);
-        if (bgmSlider != null)
-        {
-            bgmSlider.value = savedBgm / maxBgmVolume;
-            bgmSlider.onValueChanged.AddListener(SetBGMVolume);
-        }
+        if (bgmSlider != null) { bgmSlider.value = savedBgm / maxBgmVolume; bgmSlider.onValueChanged.AddListener(SetBGMVolume); }
         ApplyBGMVolume(bgmSlider != null ? bgmSlider.value : 1f);
 
         float savedSfx = PlayerPrefs.GetFloat("SFXVolume", 0.8f);
-        if (sfxSlider != null)
-        {
-            sfxSlider.value = savedSfx;
-            sfxSlider.onValueChanged.AddListener(SetSFXVolume);
-        }
+        if (sfxSlider != null) { sfxSlider.value = savedSfx; sfxSlider.onValueChanged.AddListener(SetSFXVolume); }
     }
 
     public void SetBGMVolume(float sliderValue) => ApplyBGMVolume(sliderValue);
-
     private void ApplyBGMVolume(float sliderValue)
     {
         float finalVolume = sliderValue * maxBgmVolume;
