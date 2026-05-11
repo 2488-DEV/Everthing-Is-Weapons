@@ -16,17 +16,32 @@ public class Player : MonoBehaviour
     private Camera mainCam; 
     private SpriteRenderer handSR;
     private SpriteRenderer weaponSR;
+    public GameObject selectionUI;
 
     [Header("PlayerStat")]
+    public int level = 1;
+    public float maxHealth = 100;
     public float health = 100;
     public float attackDamage;
     public float attackTime;
     public float attackTimer;
+    public float maxEXP = 20;
+    public float currentEXP;
+    private float remainingEXP;
+
     private float baseAngle;
     private bool isMouseOnLeft;
     private float mousePos;
     private bool weaponInRange = false;
+    private bool isSelecting;
     public float knockbackForce = 2000f;
+
+    [Header("PlayerBoost")]
+    public float bonusHealth;
+    public float bonusAttackDamage;
+    public float bonusAttackSpeed;
+    
+
     void Start()
     {
         mainCam = Camera.main; 
@@ -37,6 +52,7 @@ public class Player : MonoBehaviour
 
         weaponSR = weaponHandler.GetComponent<SpriteRenderer>();
         weaponHandlerScript = weaponHandler.GetComponent<WeaponHandler>();
+        health = maxHealth;
     }
 
     void Update()
@@ -49,6 +65,11 @@ public class Player : MonoBehaviour
         
         
         Attack();
+        LevelUp();
+        //if (currentEXP >= maxEXP && !isSelecting)
+        //{
+        //    StartCoroutine(LevelUpRoutine());
+        //}
 
         if (weaponInRange && Input.GetKeyDown(KeyCode.E))
         {
@@ -56,6 +77,44 @@ public class Player : MonoBehaviour
         }
     }
 
+    void LevelUp()
+    {
+        if (currentEXP >= maxEXP)
+        {
+            currentEXP -= maxEXP;
+            level += 1;
+            maxEXP *= 1.25f;
+
+            Time.timeScale = 0f;
+            selectionUI.SetActive(true);
+            selectionUI.GetComponent<CardSelect>().ShowCard();
+        }
+    }
+    IEnumerator LevelUpRoutine()
+    {
+        isSelecting = true;
+
+        while (currentEXP >= maxEXP)
+        {
+            currentEXP -= maxEXP;
+            level += 1;
+            maxEXP *= 1.25f;
+
+            Time.timeScale = 0f;
+            selectionUI.SetActive(true);
+            selectionUI.GetComponent<CardSelect>().ShowCard();
+
+            yield return new WaitUntil(() => isSelecting == false);
+
+            if (currentEXP >= maxEXP) 
+            {
+                isSelecting = true; 
+            }
+        }
+
+        selectionUI.SetActive(false);
+        Time.timeScale = 1f;
+    }
     public void ApplyKnockback(Vector3 attackerPos, float force, float duration) 
     {
         // คำนวณทิศทาง (จากคนตี -> มาที่ตัว Player)

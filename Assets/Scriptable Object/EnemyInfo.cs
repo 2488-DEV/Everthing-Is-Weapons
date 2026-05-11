@@ -10,4 +10,5 @@ public class EnemyInfo : ScriptableObject
     public float senseLocate;
     public float attackSpeed;
     public float attackReach;
+    public float expGiven;
 }

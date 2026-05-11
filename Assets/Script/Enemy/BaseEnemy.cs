@@ -88,6 +88,7 @@ public class BaseEnemy : MonoBehaviour
         {
             Debug.Log("dead");
             this.gameObject.SetActive(false);
+            player.currentEXP += enemyInfo.expGiven;
         }
     }
 
