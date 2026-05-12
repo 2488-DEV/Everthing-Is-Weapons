@@ -16,3 +16,4 @@ MonoBehaviour:
   cardDescription: Add Attack Damage for 7%
   additivePercent: 7
   starCount: 3
+  cardIMG: {fileID: 3939895358237999961, guid: d1d7df4ed09119344ad51aa0e892ccfb, type: 3}

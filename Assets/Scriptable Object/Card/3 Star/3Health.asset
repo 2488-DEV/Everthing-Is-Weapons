@@ -16,3 +16,4 @@ MonoBehaviour:
   cardDescription: Add Max Health for 15%
   additivePercent: 15
   starCount: 3
+  cardIMG: {fileID: -902086654454736923, guid: 5ad4aec913f787148a1a6e10f3c274e2, type: 3}

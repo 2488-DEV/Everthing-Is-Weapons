@@ -23,6 +23,7 @@ public class Player : MonoBehaviour
     public float maxHealth = 100;
     public float health = 100;
     public float attackDamage;
+    public float totalDamage;
     public float attackTime;
     public float attackTimer;
     public float maxEXP = 20;
@@ -33,7 +34,7 @@ public class Player : MonoBehaviour
     private bool isMouseOnLeft;
     private float mousePos;
     private bool weaponInRange = false;
-    private bool isSelecting;
+    public bool isSelecting;
     public float knockbackForce = 2000f;
 
     [Header("PlayerBoost")]
@@ -62,14 +63,19 @@ public class Player : MonoBehaviour
         moveInput = moveInput.normalized;
 
         HandleFlipAndMovementLogic();
-        
-        
+        totalDamage = attackDamage + (attackDamage * (bonusAttackDamage/100));
+
+        if (health > maxHealth)
+        {
+            health = maxHealth;
+        }
+
         Attack();
-        LevelUp();
-        //if (currentEXP >= maxEXP && !isSelecting)
-        //{
-        //    StartCoroutine(LevelUpRoutine());
-        //}
+        //LevelUp();
+        if (currentEXP >= maxEXP && !isSelecting)
+        {
+            StartCoroutine(LevelUpRoutine());
+        }
 
         if (weaponInRange && Input.GetKeyDown(KeyCode.E))
         {
@@ -98,22 +104,35 @@ public class Player : MonoBehaviour
         {
             currentEXP -= maxEXP;
             level += 1;
-            maxEXP *= 1.25f;
+            maxEXP *= 1.25f; 
 
-            Time.timeScale = 0f;
-            selectionUI.SetActive(true);
-            selectionUI.GetComponent<CardSelect>().ShowCard();
+            Transform cardDisplay = selectionUI.transform.Find("Card Display");
+            Time.timeScale = 0f; 
+
+            cardDisplay.gameObject.SetActive(true);
+
+            CardSelect cardScript = selectionUI.GetComponent<CardSelect>();
+            if (cardScript != null)
+            {
+                cardScript.ShowCard();
+            }
 
             yield return new WaitUntil(() => isSelecting == false);
+
+            cardDisplay.gameObject.SetActive(false);
 
             if (currentEXP >= maxEXP) 
             {
                 isSelecting = true; 
+
+                yield return new WaitForSecondsRealtime(0.1f);
             }
         }
 
-        selectionUI.SetActive(false);
+        isSelecting = false;
         Time.timeScale = 1f;
+
+        Debug.Log("เลเวลอัปเสร็จสิ้น! เลเวลปัจจุบัน: " + level);
     }
     public void ApplyKnockback(Vector3 attackerPos, float force, float duration) 
     {
@@ -168,7 +187,7 @@ public class Player : MonoBehaviour
 
         // 3. เอาของจากพื้นขึ้นมือ (พร้อมค่าความทนทานของมัน)
         weaponHandlerScript.SetWeapon(groundData, groundRarity, groundDurability);
-        attackTime = weaponHandlerScript.currentWeapon.attackSpeed;
+        attackTime = weaponHandlerScript.currentWeapon.attackSpeed - (weaponHandlerScript.currentWeapon.attackSpeed * bonusAttackSpeed/100);
         attackDamage = weaponHandlerScript.currentWeapon.baseDamage + weaponHandlerScript.currentRarity.rarityDamage;;
 
         Debug.Log(weaponHandlerScript.currentWeapon.attackReach);

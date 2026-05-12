@@ -10,6 +10,7 @@ public class CardSelect : MonoBehaviour
     [System.Serializable]
     public class CardUIElements
     {
+        public Button cardButton;
         public Image cardImage;
         public TextMeshProUGUI nameText;
         public TextMeshProUGUI descText;
@@ -26,53 +27,52 @@ public class CardSelect : MonoBehaviour
     public UpgradeCard[] threeStarCard;
     
     private Player player;
+    private UpgradeCard[] currentlyDisplayedCards = new UpgradeCard[3];
 
     void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null) player = playerObj.GetComponent<Player>();
         selectionUI.SetActive(false);
+
+        for (int i = 0; i < cardSlots.Length; i++)
+        {
+            int index = i; // สำคัญมาก: ต้องสร้างตัวแปรมาพักค่า i ไว้ ไม่งั้นพอกดปุ่มมันจะจำแต่ค่าสุดท้าย
+            cardSlots[index].cardButton.onClick.AddListener(() => OnClickCard(index));
+        }
     }
 
     public void ShowCard()
     {
         selectionUI.SetActive(true);
-
-        // สร้าง List เพื่อจำว่ารอบนี้ "สุ่มได้ใบไหนไปบ้างแล้ว"
         List<UpgradeCard> chosenCards = new List<UpgradeCard>();
 
         for (int i = 0; i < cardSlots.Length; i++)
         {
             UpgradeCard selectedSO = null;
             bool isDuplicate = true;
-            int safetyNet = 0; // กันเผื่อกรณีการ์ดใน Array มีไม่พอ แล้วมันจะ Loop ค้าง
+            int safetyNet = 0;
 
-            // วนลูปสุ่มใหม่จนกว่าจะได้ใบที่ไม่ซ้ำกับที่เคยสุ่มได้ในรอบนี้
             while (isDuplicate && safetyNet < 50) 
             {
                 float rand = UnityEngine.Random.value;
-                
                 if (rand < 0.6f) selectedSO = GetRandomCardFromArray(oneStarCard);
                 else if (rand < 0.9f) selectedSO = GetRandomCardFromArray(twoStarCard);
                 else selectedSO = GetRandomCardFromArray(threeStarCard);
 
-                // เช็กว่าใบที่สุ่มได้ (selectedSO) มีอยู่ใน chosenCards หรือยัง
-                if (!chosenCards.Contains(selectedSO))
-                {
-                    isDuplicate = false; // ไม่ซ้ำ! หลุดลูปไปแสดงผลได้
-                }
+                if (!chosenCards.Contains(selectedSO)) isDuplicate = false;
                 safetyNet++;
             }
 
             if (selectedSO != null)
             {
-                chosenCards.Add(selectedSO); // บันทึกไว้ว่าใบนี้ถูกเลือกแล้วนะ
-                UpdateCardUI(i, selectedSO); // แยกฟังก์ชันอัปเดต UI ออกมาให้โค้ดสะอาดขึ้น
+                chosenCards.Add(selectedSO);
+                currentlyDisplayedCards[i] = selectedSO; // เก็บค่าไว้ดึงมาดูตอนกดปุ่ม
+                UpdateCardUI(i, selectedSO);
             }
         }
     }
 
-    // ฟังก์ชันช่วยอัปเดต UI (เอาโค้ดเดิมมาใส่ตรงนี้)
     private void UpdateCardUI(int index, UpgradeCard selectedSO)
     {
         if (cardSlots[index] == null) return;
@@ -90,5 +90,47 @@ public class CardSelect : MonoBehaviour
     {
         if (cardArray == null || cardArray.Length == 0) return null;
         return cardArray[UnityEngine.Random.Range(0, cardArray.Length)];
+    }
+
+    public void OnClickCard(int index)
+    {
+        if (currentlyDisplayedCards[index] != null)
+        {
+            UpgradeCard selected = currentlyDisplayedCards[index]; 
+
+            if (selected != null) // เช็กว่ามีการ์ดในช่องนี้จริงๆ
+            {
+                Debug.Log("เลือกการ์ด: " + selected.cardName);
+
+                switch (selected.cardName)
+                {
+                    case "AttackBoost":
+                        Debug.Log("เพิ่มดาเมจแล้วจ้า");
+                        player.bonusAttackDamage += currentlyDisplayedCards[index].additivePercent;
+                        break;
+                    case "AttackSpeed":
+                        Debug.Log("เพิ่มความเร็วแล้วจ้า");
+                        player.bonusAttackSpeed += currentlyDisplayedCards[index].additivePercent;
+                        player.attackTime = player.weaponHandlerScript.currentWeapon.attackSpeed - (player.weaponHandlerScript.currentWeapon.attackSpeed * player.bonusAttackSpeed/100);
+                        break;
+                    case "HealthBoost":
+                        Debug.Log("เพิ่มเลือดแล้วจ้า");
+                        player.maxHealth += player.maxHealth * (currentlyDisplayedCards[index].additivePercent/100);
+                        break;
+                    case "KMITL Heart":
+                        Debug.Log("หัวใจลาดกระบัง!");
+                        player.health += currentlyDisplayedCards[index].additivePercent;
+                        break;
+                    default:
+                        Debug.Log("การ์ดใบนี้ยังไม่ได้ตั้งความสามารถ");
+                        break;
+                }
+
+                if (player != null)
+                {
+                    player.isSelecting = false;
+                }
+            }
+        }
     }
 }

@@ -16,3 +16,4 @@ MonoBehaviour:
   cardDescription: Add Attack Speed for 5%
   additivePercent: 5
   starCount: 3
+  cardIMG: {fileID: 4126193987413373771, guid: bea4dbb7f656ed541bf76b8fc2f65861, type: 3}

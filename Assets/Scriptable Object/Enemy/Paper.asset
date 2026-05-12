@@ -19,4 +19,4 @@ MonoBehaviour:
   senseLocate: 1
   attackSpeed: 2.5
   attackReach: 5
-  expGiven: 20
+  expGiven: 45

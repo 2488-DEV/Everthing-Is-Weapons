@@ -163,7 +163,8 @@ public class BaseEnemy : MonoBehaviour
                 if (!isGettingHit)
                 {
                     Debug.Log("<color=Red>โดนตัวเน้นๆ!</color>");
-                    health -= player.attackDamage;
+                    health -= player.attackDamage + (player.attackDamage * (player.bonusAttackDamage/100));
+                    Debug.Log("เสียเลือดไป : " + (player.attackDamage + (player.attackDamage * (player.bonusAttackDamage/100))));
                     isGettingHit = true;
                     ApplyKnockback(collision.transform.position);
                 }
