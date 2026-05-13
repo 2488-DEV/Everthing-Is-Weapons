@@ -220,4 +220,4 @@ public class MainMenuControl : MonoBehaviour
         if (howToPlayPanel != null) howToPlayPanel.SetActive(false);
         Time.timeScale = 1f;
     }
-}
+}                                               
