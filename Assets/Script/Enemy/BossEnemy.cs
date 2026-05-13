@@ -3,8 +3,10 @@ using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using System.Collections;
 
-public class BaseEnemy : MonoBehaviour
+public class BossEnemy : MonoBehaviour
 {
+    public Transform playerTransform; 
+
     public EnemyInfo enemyInfo;
     public Transform weaponHandler;
     private SpriteRenderer sr;
@@ -26,10 +28,12 @@ public class BaseEnemy : MonoBehaviour
     public float knockbackForce = 2000f;
     public WeaponHandler weaponHandlerScript;
     
-    
-    // 1. เพิ่มตัวแปรเพื่อเก็บข้อมูลตำแหน่งของ Player
-    public Transform playerTransform; 
+    [Header("BossMove")]
+    public GameObject[] hitBox;
+    public GameObject[] VFX;
 
+    // 1. เพิ่มตัวแปรเพื่อเก็บข้อมูลตำแหน่งของ Player
+    
     void Start()
     {
         
@@ -83,9 +87,12 @@ public class BaseEnemy : MonoBehaviour
             }
             if (Timer <= 0) 
             {
-                Attack();
-                MoveTowardsPlayer();
                 Sense.GetComponent<SpriteRenderer>().enabled = false;
+                LookAtPlayer();
+                if (attackTimer <= 0)
+                {
+                    BossFirstMove();
+                }
             }
         }
     }
@@ -127,6 +134,13 @@ public class BaseEnemy : MonoBehaviour
         }
 
         // ส่วนการหันหน้า (Flip) ให้ไว้นอก if เพื่อให้มันหันมอง Player ตลอดเวลาแม้จะหยุดเดินแล้ว
+        if (playerTransform.position.x < transform.position.x)
+            sr.flipX = false;
+        else
+            sr.flipX = true;
+    }
+    void LookAtPlayer()
+    {
         if (playerTransform.position.x < transform.position.x)
             sr.flipX = false;
         else
@@ -190,5 +204,46 @@ public class BaseEnemy : MonoBehaviour
                 }
             }
         }
+    }
+    
+    void BossFirstMove()
+    {
+        if (playerTransform == null) return;
+
+        GameObject paperPrefab = null;
+
+        foreach (GameObject go in VFX)
+        {
+            // --- เพิ่มบรรทัดนี้เพื่อกัน Error ครับเจมส์ ---
+            if (go == null) continue; 
+            // ---------------------------------------
+    
+            if (go.name == "Paper") 
+            {
+                paperPrefab = go;
+                break;
+            }
+        }
+
+        if (paperPrefab == null)
+        {
+            Debug.LogError("หา VFX ชื่อ Paper ไม่เจอจ้าเจมส์");
+            return;
+        }
+
+        // 2. เสกกระดาษออกมาจาก "กลางตัวบอส" (transform.position)
+        GameObject projectile = Instantiate(paperPrefab, transform.position, Quaternion.identity);
+
+        // 3. คำนวณทิศทางจาก "กลางตัวบอส" ไปหา Player
+        Vector2 shootDirection = (Vector2)playerTransform.position - (Vector2)transform.position;
+
+        // 4. ส่งทิศทางไปให้กระดาษพุ่ง
+        PaperProjectile paperScript = projectile.GetComponent<PaperProjectile>();
+        if (paperScript != null)
+        {
+            paperScript.SetDirection(shootDirection);
+        }
+
+        attackTimer = 2;
     }
 }

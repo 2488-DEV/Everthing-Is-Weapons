@@ -1,19 +1,10 @@
 fileFormatVersion: 2
-guid: d973b7927b8163146bda6aec172cc9d9
+guid: 2f0c0b7e69f46824f89b2cf1cc6d833f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2424553518018739129
-    second: boss_0
-  - first:
-      213: -3588229512158965765
-    second: boss_1
-  - first:
-      213: -6963195877183015321
-    second: boss_2
-  - first:
-      213: 7801903984715115176
-    second: boss_3
+      213: 5635429535640507193
+    second: big boss2_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -84,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -109,89 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Hand
+      name: big boss2_0
       rect:
         serializedVersion: 2
-        x: 148
-        y: 238
-        width: 28
-        height: 26
+        x: 67
+        y: 41
+        width: 671
+        height: 577
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 744c193db614a5ed0800000000000000
-      internalID: -2424553518018739129
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Body
-      rect:
-        serializedVersion: 2
-        x: 181
-        y: 150
-        width: 155
-        height: 250
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: bff013b154c043ec0800000000000000
-      internalID: -3588229512158965765
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: FootL
-      rect:
-        serializedVersion: 2
-        x: 196
-        y: 114
-        width: 36
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 766ba070e32cd5f90800000000000000
-      internalID: -6963195877183015321
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: FootR
-      rect:
-        serializedVersion: 2
-        x: 293
-        y: 116
-        width: 31
-        height: 29
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 8aa26ac765ee54c60800000000000000
-      internalID: 7801903984715115176
+      spriteID: 933d89c0e41153e40800000000000000
+      internalID: 5635429535640507193
       vertices: []
       indices: 
       edges: []
@@ -200,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: b6dc0e56c445c8c44abd36d29b66efe8
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -210,10 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Body: -3588229512158965765
-      FootL: -6963195877183015321
-      FootR: 7801903984715115176
-      Hand: -2424553518018739129
+      big boss2_0: 5635429535640507193
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

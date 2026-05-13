@@ -10,15 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c1cc8811971313049b4279df0763a595, type: 3}
-  m_Name: Paper
+  m_Name: DogBoss
   m_EditorClassIdentifier: 
-  health: 10
-  speed: 3
-  attackDamage: 10
-  enemyModel: {fileID: 7364966758012338123, guid: 2f263316cd52e9c439b81e83e0f98736, type: 3}
+  enemyName: Dog Boss
+  health: 150
+  speed: 1.5
+  attackDamage: 25
+  enemyModel: {fileID: 7969173977759734953, guid: afec25f86ce823946bd92178fdb564c4, type: 3}
   senseLocate: 1
-  attackSpeed: 2.5
+  attackSpeed: 3
   attackReach: 5
-  expGiven: 45
+  expGiven: 150
   offset: 2.5
-  durabilityCost: 10
+  durabilityCost: 15

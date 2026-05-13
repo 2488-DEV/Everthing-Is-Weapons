@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c1cc8811971313049b4279df0763a595, type: 3}
-  m_Name: Paper
+  m_Name: BlackMan
   m_EditorClassIdentifier: 
-  health: 10
-  speed: 3
-  attackDamage: 10
-  enemyModel: {fileID: 7364966758012338123, guid: 2f263316cd52e9c439b81e83e0f98736, type: 3}
+  health: 100
+  speed: 2
+  attackDamage: 0
+  enemyModel: {fileID: 9159886069550649499, guid: a745056f294f1074381bc97f129d55c7, type: 3}
   senseLocate: 1
-  attackSpeed: 2.5
-  attackReach: 5
-  expGiven: 45
-  offset: 2.5
+  attackSpeed: 0.8
+  attackReach: 1.25
+  expGiven: 30
+  offset: 1
   durabilityCost: 10

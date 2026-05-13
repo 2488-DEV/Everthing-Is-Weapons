@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
     private SpriteRenderer handSR;
     private SpriteRenderer weaponSR;
     public GameObject selectionUI;
+    public bool isHand;
 
     [Header("PlayerStat")]
     public int level = 1;
@@ -58,6 +59,10 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        if (attackTime < 0.1f)
+        {
+            attackTime = 0.1f;
+        }
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
         moveInput = moveInput.normalized;
@@ -221,12 +226,8 @@ public class Player : MonoBehaviour
                         string rName = weaponHandlerScript.currentRarity.rarityName; // สมมติว่ามีชื่อใน SO
 
                         // 2. ลดความทนทาน (ถ้าพัง currentWeapon จะกลายเป็น null ในบรรทัดนี้)
-                        float durabilityCost = 10f;
-                        weaponHandlerScript.DecreaseDurability(durabilityCost);
-
-                        // 3. แสดงผลโดยใช้ตัวแปรที่เราจดไว้ (ไม่ไปดึงจาก currentWeapon โดยตรงแล้ว)
-                        // ใช้ string.Format หรือ interpolation จะอ่านง่ายขึ้นครับเจมส์
                         Debug.Log($"ตีด้วย {wName} | ความแรงรวม: {finalDmg} | ระดับ: {rName} | ความเร็วโจมตี: {weaponHandlerScript.currentWeapon.attackSpeed} |ความคงทนเหลือ: {weaponHandlerScript.currentDurability}");
+                        
 
                         // 4. เช็กเสริมเผื่ออยากรู้ว่าพังหรือยัง
                         if (weaponHandlerScript.currentWeapon == null)
@@ -270,6 +271,13 @@ public class Player : MonoBehaviour
             }
         }
     }
+    public void ResetAttack()
+    {
+        attackTimer = 0; // หยุดการนับเวลาโจมตี
+        HitBox.gameObject.SetActive(false); // ปิด Hitbox ทันที
+        // คืนค่าตำแหน่งหมุนของมือให้เป็นปกติ (0 องศา หรือตำแหน่งเริ่มต้น)
+        handTransform.localRotation = Quaternion.identity; 
+    }
     void HandleFlipAndMovementLogic()
     {
         Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
@@ -277,8 +285,7 @@ public class Player : MonoBehaviour
         
         
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        
-        Debug.Log(isMouseOnLeft);
+
         if (attackTimer <= 0)
         {   
             HitBox.gameObject.SetActive(false);
@@ -373,6 +380,10 @@ public class Player : MonoBehaviour
                 weaponInRange = true;
                 weaponNew = item;
             }
+        }
+        if (collision.gameObject.CompareTag("Hand"))
+        {
+            isHand = true;
         }
     }
 

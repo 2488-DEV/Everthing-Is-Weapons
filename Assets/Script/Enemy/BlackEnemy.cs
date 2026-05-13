@@ -1,9 +1,8 @@
-using System.ComponentModel.Design;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using System.Collections;
 
-public class BaseEnemy : MonoBehaviour
+public class BlackEnemy : MonoBehaviour
 {
     public EnemyInfo enemyInfo;
     public Transform weaponHandler;
@@ -17,6 +16,8 @@ public class BaseEnemy : MonoBehaviour
     public float attackDamage;
     public AttackArea AttackArea;
     public GameObject Sense;
+    public GameObject Hand;
+    public float handSpeed;
     public float waitTimer = 1.0f;
     public float Timer;
     public float attackTimer;
@@ -24,6 +25,7 @@ public class BaseEnemy : MonoBehaviour
     private Player player;
     private Rigidbody2D rb;
     public float knockbackForce = 2000f;
+    public float offsetY = 1f;
     public WeaponHandler weaponHandlerScript;
     
     
@@ -32,7 +34,6 @@ public class BaseEnemy : MonoBehaviour
 
     void Start()
     {
-        
         weaponHandlerScript = weaponHandler.GetComponent<WeaponHandler>();
         AttackArea.transform.localScale = new Vector3(enemyInfo.attackReach , enemyInfo.attackReach , enemyInfo.attackReach);
         UpdateWeaponVisual();
@@ -63,6 +64,12 @@ public class BaseEnemy : MonoBehaviour
 
     void Update()
     {   
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            player = playerObj.GetComponent<Player>();
+            playerTransform = playerObj.transform;
+        }
         if (player.attackTimer <= 0)
         {
             isGettingHit = false;
@@ -84,8 +91,15 @@ public class BaseEnemy : MonoBehaviour
             if (Timer <= 0) 
             {
                 Attack();
-                MoveTowardsPlayer();
+                MoveAwayFromPlayer();
                 Sense.GetComponent<SpriteRenderer>().enabled = false;
+            }
+        }
+        if (DetectionArea.GetComponent<DetectionArea>().handDetect)
+        {   
+            if (Timer <= 0)
+            {
+                MoveTowardsPlayer();
             }
         }
     }
@@ -113,20 +127,42 @@ public class BaseEnemy : MonoBehaviour
 
     void MoveTowardsPlayer()
     {
-        float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
+        // 1. สร้างตำแหน่งเป้าหมายใหม่ (เอาตำแหน่ง Player มาบวกค่าความสูงที่เราต้องการ)
+        Vector2 targetPosition = new Vector2(
+            playerTransform.position.x, 
+            playerTransform.position.y + offsetY
+        );
 
-        float offset = enemyInfo.offset; 
+        // 2. สั่งให้มือวิ่งไปที่ targetPosition แทนที่จะเป็นตัว Player ตรงๆ
+        Hand.transform.position = Vector2.MoveTowards(
+            Hand.transform.position, 
+            targetPosition, 
+            handSpeed * Time.deltaTime
+        );
 
-        if (distanceToPlayer > offset)
-        {
-            transform.position = Vector2.MoveTowards(
-                transform.position, 
-                playerTransform.position, 
-                enemyInfo.speed * Time.deltaTime
-            );
-        }
+        // เช็กทิศทางเพื่อ Flip (ใช้ตำแหน่งเป้าหมายมาเช็ก)
+        if (targetPosition.x < transform.position.x)
+            sr.flipX = false;
+        else
+            sr.flipX = true;
+    }
+    void MoveAwayFromPlayer()
+    {
+        // 1. หาความต่างของตำแหน่งเพื่อหาทิศทางที่จะ "หนี"
+        // (ตำแหน่งของศัตรูเอง - ตำแหน่งของ Player) = ทิศทางที่พุ่งออกจาก Player
+        Vector2 directionAway = (transform.position - playerTransform.position).normalized;
 
-        // ส่วนการหันหน้า (Flip) ให้ไว้นอก if เพื่อให้มันหันมอง Player ตลอดเวลาแม้จะหยุดเดินแล้ว
+        // 2. กำหนดจุดเป้าหมายสมมติที่อยู่ห่างออกไปในทิศทางนั้น
+        Vector2 targetPos = (Vector2)transform.position + directionAway;
+
+        // 3. ใช้ MoveTowards เพื่อเคลื่อนที่ไปยังจุดที่ห่างออกไป
+        transform.position = Vector2.MoveTowards(
+            transform.position, 
+            targetPos, 
+            enemyInfo.speed * Time.deltaTime
+        );
+
+        // ส่วนการหันหน้า (Flip) ให้จ้อง Player ไว้ตลอด (ถอยหลังแบบ Moonwalk)
         if (playerTransform.position.x < transform.position.x)
             sr.flipX = false;
         else
