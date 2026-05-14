@@ -251,7 +251,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -544734455
-  m_SortingLayer: 1
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 5635429535640507193, guid: 2f0c0b7e69f46824f89b2cf1cc6d833f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -340,6 +340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c00a64c1dca48043aecf7ac1ebe7037, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerTransform: {fileID: 0}
   enemyInfo: {fileID: 11400000, guid: 80ae41d1cda00cc49bc20ad880c67987, type: 2}
   weaponHandler: {fileID: 8199470793020797650, guid: b74550e8711140644a904043315afbad, type: 3}
   playerDetect: 0
@@ -358,8 +359,18 @@ MonoBehaviour:
   knockbackForce: 2000
   weaponHandlerScript: {fileID: 6523492119523214575, guid: b74550e8711140644a904043315afbad, type: 3}
   hitBox:
-  - {fileID: 0}
-  playerTransform: {fileID: 0}
+  - {fileID: 8352057475752761547, guid: ccdf72fae6141bb40aec1fc1f87ba304, type: 3}
+  - {fileID: 6181455063972493094, guid: ede21e340261b8c4ca7aec5feec526d1, type: 3}
+  VFX:
+  - {fileID: 8365487459537967655, guid: 9980e22cd520baf47a213fa852e9363f, type: 3}
+  - {fileID: 559892624739309478, guid: 4071bf52f17de6e46a53c9581926f8ce, type: 3}
+  isAttacking: 0
+  warningDuration: 1
+  chargeDuration: 0.5
+  isDashing: 0
+  slamWarningDuration: 1.5
+  slamRadius: 6.5
+  smokeScaleDuration: 0.5
 --- !u!1 &7275786318394883422
 GameObject:
   m_ObjectHideFlags: 0
