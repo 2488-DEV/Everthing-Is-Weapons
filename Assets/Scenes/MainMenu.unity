@@ -798,7 +798,7 @@ MonoBehaviour:
           m_MethodName: PlayHoverSoundStart
           m_Mode: 2
           m_Arguments:
-            m_ObjectArgument: {fileID: 8300000, guid: fd67aaba06b4b744ab800d97d34158b0, type: 3}
+            m_ObjectArgument: {fileID: 8300000, guid: cd3f23349ee4aaf47b62d4cd1c96cf23, type: 3}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.AudioClip, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0

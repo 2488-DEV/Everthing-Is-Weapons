@@ -43,7 +43,7 @@ public class Player : MonoBehaviour
     public float bonusAttackDamage;
     public float bonusAttackSpeed;
     
-
+    
     void Start()
     {
         mainCam = Camera.main; 

@@ -339,7 +339,7 @@ MonoBehaviour:
   weaponHandlerScript: {fileID: 0}
   weaponNew: {fileID: 0}
   speed: 5
-  selectionUI: {fileID: 0}
+  selectionUI: {fileID: 6653994012635051028, guid: 0780e62dabd794546954fe02db8c84c1, type: 3}
   isHand: 0
   level: 1
   maxHealth: 100
