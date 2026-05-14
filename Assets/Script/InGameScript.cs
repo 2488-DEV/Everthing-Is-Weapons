@@ -3,7 +3,7 @@ using UnityEngine;
 public class InGameScript
 {
     public static int currentStage = 5; 
-    public static int enemyCount = 1;
+    public static int enemyCount = 0;
 
     public static void NextStage()
     {

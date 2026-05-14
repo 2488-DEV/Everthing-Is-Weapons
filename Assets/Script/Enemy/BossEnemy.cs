@@ -2,6 +2,7 @@ using System.ComponentModel.Design;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BossEnemy : MonoBehaviour
 {
@@ -31,8 +32,16 @@ public class BossEnemy : MonoBehaviour
     [Header("BossMove")]
     public GameObject[] hitBox;
     public GameObject[] VFX;
+    public bool isAttacking = false;
+    public float warningDuration = 1.0f;
+    public float chargeDuration = 0.5f;
+    public bool isDashing = false;
 
-    // 1. เพิ่มตัวแปรเพื่อเก็บข้อมูลตำแหน่งของ Player
+    [Header("JumpMove")]
+    public float slamWarningDuration = 1.5f;
+    public float slamRadius = 6.5f;
+    public float smokeScaleDuration = 0.5f;
+    private List<GameObject> activeWarnings = new List<GameObject>();
     
     void Start()
     {
@@ -63,6 +72,10 @@ public class BossEnemy : MonoBehaviour
         }
 
         rb = GetComponent<Rigidbody2D>();
+
+        // ซ่อน hitBox และ VFX ทั้งหมดตอน Start
+        foreach (var go in hitBox) { if (go != null) go.SetActive(false); }
+        foreach (var go in VFX) { if (go != null) go.SetActive(false); }
     }
 
     void Update()
@@ -72,6 +85,7 @@ public class BossEnemy : MonoBehaviour
             isGettingHit = false;
         }
         HealthUpdate();
+        if (health <= 0) return; // บอสตายแล้ว หยุด Update เลย
         if (attackTimer > 0)
         {
             attackTimer -= Time.deltaTime;
@@ -89,9 +103,25 @@ public class BossEnemy : MonoBehaviour
             {
                 Sense.GetComponent<SpriteRenderer>().enabled = false;
                 LookAtPlayer();
-                if (attackTimer <= 0)
+                if (attackTimer <= 0 && !isAttacking)
                 {
-                    BossFirstMove();
+                    float playerRange = Vector2.Distance(transform.position, playerTransform.position);
+                    if (playerRange > 5)
+                    {
+                        int randomMove = Random.Range(0, 2); // 0 or 1
+                        if (randomMove == 0)
+                        {
+                            BossFirstMove();
+                        }
+                        else
+                        {
+                            StartCoroutine(BossChargeMoveCoroutine());
+                        }
+                    }
+                    else
+                    {
+                        StartCoroutine(BossSlamMoveCoroutine());
+                    }
                 }
             }
         }
@@ -113,9 +143,27 @@ public class BossEnemy : MonoBehaviour
         if (health <= 0)
         {
             Debug.Log("dead");
+            CleanUpAttacks();
             this.gameObject.SetActive(false);
             player.currentEXP += enemyInfo.expGiven;
         }
+    }
+
+    void OnDisable()
+    {
+        CleanUpAttacks();
+    }
+
+    void CleanUpAttacks()
+    {
+        StopAllCoroutines();
+        foreach (GameObject go in activeWarnings)
+        {
+            if (go != null) Destroy(go);
+        }
+        activeWarnings.Clear();
+        isAttacking = false;
+        isDashing = false;
     }
 
     void MoveTowardsPlayer()
@@ -210,6 +258,8 @@ public class BossEnemy : MonoBehaviour
     {
         if (playerTransform == null) return;
 
+        isAttacking = true;
+
         GameObject paperPrefab = null;
 
         foreach (GameObject go in VFX)
@@ -218,7 +268,7 @@ public class BossEnemy : MonoBehaviour
             if (go == null) continue; 
             // ---------------------------------------
     
-            if (go.name == "Paper") 
+            if (go.name.Contains("Paper")) 
             {
                 paperPrefab = go;
                 break;
@@ -228,11 +278,13 @@ public class BossEnemy : MonoBehaviour
         if (paperPrefab == null)
         {
             Debug.LogError("หา VFX ชื่อ Paper ไม่เจอจ้าเจมส์");
+            isAttacking = false;
             return;
         }
 
         // 2. เสกกระดาษออกมาจาก "กลางตัวบอส" (transform.position)
         GameObject projectile = Instantiate(paperPrefab, transform.position, Quaternion.identity);
+        projectile.SetActive(true);
 
         // 3. คำนวณทิศทางจาก "กลางตัวบอส" ไปหา Player
         Vector2 shootDirection = (Vector2)playerTransform.position - (Vector2)transform.position;
@@ -245,5 +297,203 @@ public class BossEnemy : MonoBehaviour
         }
 
         attackTimer = 2;
+        isAttacking = false;
+    }
+
+    IEnumerator BossChargeMoveCoroutine()
+    {
+        if (playerTransform == null) yield break;
+
+        isAttacking = true;
+
+        // 1. จำตำแหน่ง Player ณ ตอนนี้
+        Vector2 targetPos = playerTransform.position;
+        Vector2 bossPos = transform.position;
+        Vector2 direction = targetPos - bossPos;
+        float distance = direction.magnitude;
+
+        // 2. สร้าง Warning Indicator (hitBox[0]) เป็นเส้นยาวจากบอสไปหา Player
+        GameObject warningIndicator = null;
+        if (hitBox.Length > 0 && hitBox[0] != null)
+        {
+            Vector2 midPoint = (bossPos + targetPos) / 2f;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+            warningIndicator = Instantiate(hitBox[0], midPoint, Quaternion.Euler(0, 0, angle), transform);
+            // Scale X = ระยะทาง (ความยาวเส้น), Scale Y = ความกว้างของ hitbox
+            warningIndicator.transform.localScale = new Vector3(distance, warningIndicator.transform.localScale.y, 1f);
+            warningIndicator.SetActive(true);
+            activeWarnings.Add(warningIndicator);
+        }
+
+        // 3. รอให้ผู้เล่นเห็น Warning
+        yield return new WaitForSeconds(warningDuration);
+
+        // 4. ลบ Warning Indicator
+        if (warningIndicator != null)
+        {
+            activeWarnings.Remove(warningIndicator);
+            Destroy(warningIndicator);
+        }
+
+        // 5. เริ่ม Dash ไปยังตำแหน่งเป้าหมาย
+        isDashing = true;
+        float elapsedTime = 0f;
+        Vector2 startPos = transform.position;
+
+        while (elapsedTime < chargeDuration)
+        {
+            transform.position = Vector2.Lerp(startPos, targetPos, elapsedTime / chargeDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = targetPos;
+
+        // 6. จบ Dash
+        isDashing = false;
+        attackTimer = 2;
+        isAttacking = false;
+    }
+
+    // เช็กว่าบอสชนผู้เล่นขณะ Dash หรือไม่
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (isDashing && collision.gameObject.CompareTag("Player"))
+        {
+            player.health -= attackDamage;
+            player.ApplyKnockback(transform.position, 2f, 0.1f);
+        }
+    }
+
+    IEnumerator BossSlamMoveCoroutine()
+    {
+        if (playerTransform == null) yield break;
+
+        isAttacking = true;
+
+        // 1. หา Circle Warning prefab จาก hitBox array
+        GameObject circlePrefab = null;
+        if (hitBox.Length > 1 && hitBox[1] != null)
+        {
+            circlePrefab = hitBox[1];
+        }
+
+        // 2. สร้าง Circle Warning ตรงตำแหน่งบอส เป็น child ของบอสเพื่อให้ตามบอสไป
+        GameObject circleWarning = null;
+        if (circlePrefab != null)
+        {
+            circleWarning = Instantiate(circlePrefab, transform.position, Quaternion.identity, transform);
+            circleWarning.transform.localPosition = Vector3.zero;
+            // Scale ให้เท่ากับ slamRadius * 2 (เส้นผ่านศูนย์กลาง)
+            float diameter = slamRadius * 2f;
+            circleWarning.transform.localScale = new Vector3(diameter, diameter, 1f);
+            circleWarning.SetActive(true);
+            activeWarnings.Add(circleWarning);
+        }
+
+        // 3. รอให้ผู้เล่นเห็น Warning แล้วหนี
+        yield return new WaitForSeconds(slamWarningDuration);
+
+        // 4. ปิด SpriteRenderer ของ hitbox warning (ไม่ทำลาย เพราะอาจใช้ collider ต่อ)
+        if (circleWarning != null)
+        {
+            SpriteRenderer warningSR = circleWarning.GetComponent<SpriteRenderer>();
+            if (warningSR != null)
+            {
+                warningSR.enabled = false;
+            }
+        }
+
+        // 5. บอสนั่งทับ! Squish sprite ลงเพื่อจำลองการกระแทก
+        Vector3 originalScale = transform.localScale;
+        transform.localScale = new Vector3(originalScale.x * 1.3f, originalScale.y * 0.6f, originalScale.z);
+        yield return new WaitForSeconds(0.15f);
+        transform.localScale = originalScale;
+
+        // 6. เช็กว่า Player อยู่ในรัศมี slam หรือไม่ ถ้าอยู่ก็โดนดาเมจ
+        float distToPlayer = Vector2.Distance(transform.position, playerTransform.position);
+        if (distToPlayer <= slamRadius)
+        {
+            player.health -= attackDamage;
+            player.ApplyKnockback(transform.position, 3f, 0.15f);
+        }
+
+        // 7. ลบ Circle Warning
+        if (circleWarning != null)
+        {
+            activeWarnings.Remove(circleWarning);
+            Destroy(circleWarning);
+        }
+
+        // 8. เสก Smoke VFX
+        GameObject smokePrefab = null;
+        foreach (GameObject go in VFX)
+        {
+            if (go == null) continue;
+            if (go.name.Contains("Smoke"))
+            {
+                smokePrefab = go;
+                break;
+            }
+        }
+
+        if (smokePrefab != null)
+        {
+            GameObject smoke = Instantiate(smokePrefab, transform.position, Quaternion.identity);
+            smoke.SetActive(true);
+
+            // บังคับให้ SpriteRenderer เปิดและ alpha เต็ม
+            SpriteRenderer smokeSR = smoke.GetComponent<SpriteRenderer>();
+            if (smokeSR != null)
+            {
+                smokeSR.enabled = true;
+                Color c = smokeSR.color;
+                c.a = 1f;
+                smokeSR.color = c;
+            }
+
+            Debug.Log("<color=green>Smoke VFX spawned!</color> Position: " + smoke.transform.position + " Active: " + smoke.activeSelf);
+            StartCoroutine(SmokeEffectCoroutine(smoke));
+        }
+        else
+        {
+            Debug.LogWarning("หา Smoke VFX ไม่เจอใน VFX array!");
+        }
+
+        attackTimer = 2;
+        isAttacking = false;
+    }
+
+    IEnumerator SmokeEffectCoroutine(GameObject smoke)
+    {
+        if (smoke == null) yield break;
+
+        SpriteRenderer smokeSR = smoke.GetComponent<SpriteRenderer>();
+        Vector3 startScale = smoke.transform.localScale;
+        Vector3 endScale = startScale * 3f; // ขยายใหญ่ขึ้น 3 เท่า
+        Color startColor = smokeSR != null ? smokeSR.color : Color.white;
+
+        float elapsed = 0f;
+
+        while (elapsed < smokeScaleDuration)
+        {
+            float t = elapsed / smokeScaleDuration;
+
+            // ขยาย Scale
+            smoke.transform.localScale = Vector3.Lerp(startScale, endScale, t);
+
+            // Fade alpha
+            if (smokeSR != null)
+            {
+                Color c = startColor;
+                c.a = Mathf.Lerp(1f, 0f, t);
+                smokeSR.color = c;
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        Destroy(smoke);
     }
 }
