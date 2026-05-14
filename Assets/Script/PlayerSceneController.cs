@@ -31,7 +31,6 @@ public class PlayerSceneController : MonoBehaviour
         {
             if (hit.CompareTag("Door"))
             {
-                InGameScript.NextStage();
                 Debug.Log("[PlayerSceneController] Detected Door via OverlapCircle!");
                 hasTriggered = true;
                 LoadRandomScene();

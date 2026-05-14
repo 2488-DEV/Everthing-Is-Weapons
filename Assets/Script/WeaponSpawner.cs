@@ -49,6 +49,7 @@ public class WeaponSpawner : MonoBehaviour
         foreach (WeaponRarity r in rarityPool) 
         {
             totalChance += r.rarityChance;
+            Debug.Log(totalChance);
         }
 
         float randomPoint = Random.Range(0, totalChance);

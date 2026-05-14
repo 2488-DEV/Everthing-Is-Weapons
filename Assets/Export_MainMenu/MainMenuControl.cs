@@ -42,14 +42,7 @@ public class MainMenuControl : MonoBehaviour
 
     void Start()
     {
-        // [อัปเดตเพิ่ม] ถ้ากลับมาหน้า MainMenu ให้สั่งทำลายเพลงต่อเนื่อง (GlobalBGM) ทิ้งทันที
-        if (SceneManager.GetActiveScene().name == "MainMenu")
-        {
-            GameObject oldBGM = GameObject.Find("GlobalBGM");
-            if (oldBGM != null) Destroy(oldBGM);
-        }
-
-        // [ส่วนเดิม] ค้นหา Object "GlobalBGM" เพื่อให้ Slider ยังคุมเสียงต่อเนื่องได้
+        // [อัปเดตใหม่] ค้นหา Object "GlobalBGM" เพื่อให้ Slider ยังคุมเสียงต่อเนื่องได้
         if (bgmSource == null)
         {
             GameObject bgmObj = GameObject.Find("GlobalBGM");
@@ -227,4 +220,4 @@ public class MainMenuControl : MonoBehaviour
         if (howToPlayPanel != null) howToPlayPanel.SetActive(false);
         Time.timeScale = 1f;
     }
-}
+}                                               
