@@ -1622,6 +1622,9 @@ SpriteRenderer:
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> parent of 107149d (Revert "Backup (for new one)")
 --- !u!1001 &688503851
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1796,10 +1799,13 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: da9bea058dc779948a8b74dcfbbb9ee1, type: 3}
 --- !u!1001 &861827468
 PrefabInstance:
+<<<<<<< HEAD
 =======
 --- !u!1 &907937527
 GameObject:
 >>>>>>> parent of fffcaaa (Merge remote-tracking branch 'origin/BIN' into JAMES)
+=======
+>>>>>>> parent of 107149d (Revert "Backup (for new one)")
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
@@ -2539,5 +2545,8 @@ SceneRoots:
   - {fileID: 541146675}
   - {fileID: 146775565}
   - {fileID: 861827468}
+<<<<<<< HEAD
 =======
 >>>>>>> parent of fffcaaa (Merge remote-tracking branch 'origin/BIN' into JAMES)
+=======
+>>>>>>> parent of 107149d (Revert "Backup (for new one)")

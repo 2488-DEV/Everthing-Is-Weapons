@@ -42,6 +42,9 @@ public class MainMenuControl : MonoBehaviour
     void Start()
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> parent of 107149d (Revert "Backup (for new one)")
         // [อัปเดตเพิ่ม] ถ้ากลับมาหน้า MainMenu ให้สั่งทำลายเพลงต่อเนื่อง (GlobalBGM) ทิ้งทันที
         if (SceneManager.GetActiveScene().name == "MainMenu")
         {

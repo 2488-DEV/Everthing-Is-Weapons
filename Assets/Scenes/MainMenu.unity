@@ -875,10 +875,14 @@ MonoBehaviour:
           m_Mode: 2
           m_Arguments:
 <<<<<<< HEAD
+<<<<<<< HEAD
             m_ObjectArgument: {fileID: 8300000, guid: cd3f23349ee4aaf47b62d4cd1c96cf23, type: 3}
 =======
             m_ObjectArgument: {fileID: 8300000, guid: f8a0101bf0ae4a446a4b1f382b6d9826, type: 3}
 >>>>>>> parent of fffcaaa (Merge remote-tracking branch 'origin/BIN' into JAMES)
+=======
+            m_ObjectArgument: {fileID: 8300000, guid: cd3f23349ee4aaf47b62d4cd1c96cf23, type: 3}
+>>>>>>> parent of 107149d (Revert "Backup (for new one)")
             m_ObjectArgumentAssemblyTypeName: UnityEngine.AudioClip, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0

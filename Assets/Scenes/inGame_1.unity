@@ -1576,10 +1576,14 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
 <<<<<<< HEAD
+<<<<<<< HEAD
   m_LocalPosition: {x: -2.128601, y: -5.6317024, z: -10}
 =======
   m_LocalPosition: {x: -3.040556, y: -5.2100024, z: -10}
 >>>>>>> parent of fffcaaa (Merge remote-tracking branch 'origin/BIN' into JAMES)
+=======
+  m_LocalPosition: {x: -2.128601, y: -5.6317024, z: -10}
+>>>>>>> parent of 107149d (Revert "Backup (for new one)")
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1721,6 +1725,9 @@ MonoBehaviour:
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> parent of 107149d (Revert "Backup (for new one)")
 --- !u!114 &1189043798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1842,8 +1849,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1819668356}
   m_SourcePrefab: {fileID: 100100000, guid: 727df407796ed334bb27b9a0e82d8364, type: 3}
+<<<<<<< HEAD
 =======
 >>>>>>> parent of fffcaaa (Merge remote-tracking branch 'origin/BIN' into JAMES)
+=======
+>>>>>>> parent of 107149d (Revert "Backup (for new one)")
 --- !u!1 &1586319291
 GameObject:
   m_ObjectHideFlags: 0
@@ -2474,9 +2484,12 @@ SceneRoots:
   - {fileID: 1189043793}
 <<<<<<< HEAD
   - {fileID: 5077604161514462242}
+<<<<<<< HEAD
 =======
   - {fileID: 907937529}
 >>>>>>> parent of fffcaaa (Merge remote-tracking branch 'origin/BIN' into JAMES)
+=======
+>>>>>>> parent of 107149d (Revert "Backup (for new one)")
   - {fileID: 94654260}
   - {fileID: 600711305}
   - {fileID: 1881822216}
@@ -2495,5 +2508,8 @@ SceneRoots:
   - {fileID: 1046012307}
   - {fileID: 1846794807}
   - {fileID: 950196801}
+<<<<<<< HEAD
 =======
 >>>>>>> parent of fffcaaa (Merge remote-tracking branch 'origin/BIN' into JAMES)
+=======
+>>>>>>> parent of 107149d (Revert "Backup (for new one)")
