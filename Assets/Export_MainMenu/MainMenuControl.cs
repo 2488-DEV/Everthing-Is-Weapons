@@ -38,10 +38,10 @@ public class MainMenuControl : MonoBehaviour
     public float fadeDuration = 1.0f;
 
     private Coroutine lightFadeRoutine;
-    private bool isStarting = false;
 
     void Start()
     {
+<<<<<<< HEAD
         // [อัปเดตเพิ่ม] ถ้ากลับมาหน้า MainMenu ให้สั่งทำลายเพลงต่อเนื่อง (GlobalBGM) ทิ้งทันที
         if (SceneManager.GetActiveScene().name == "MainMenu")
         {
@@ -56,6 +56,8 @@ public class MainMenuControl : MonoBehaviour
             if (bgmObj != null) bgmSource = bgmObj.GetComponent<AudioSource>();
         }
 
+=======
+>>>>>>> parent of fffcaaa (Merge remote-tracking branch 'origin/BIN' into JAMES)
         SetupAudio();
         CloseAllPanels();
         AudioListener.volume = 1.0f;
@@ -68,59 +70,27 @@ public class MainMenuControl : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            HandleEscapeKey();
-        }
-    }
-
-    // --- [LOGIC พิเศษสำหรับปุ่ม ESC] ---
-    private void HandleEscapeKey()
-    {
-        if (settingPanel != null && settingPanel.activeSelf)
-        {
-            CloseSetting();
-            return;
-        }
-
-        if (informationPanel != null && informationPanel.activeSelf)
-        {
-            informationPanel.SetActive(false);
-            return;
-        }
-
-        if (howToPlayPanel != null && howToPlayPanel.activeSelf)
-        {
-            howToPlayPanel.SetActive(false);
-            return;
-        }
-
-        if (SceneManager.GetActiveScene().name != "MainMenu")
-        {
-            OpenSetting();
+            if (settingPanel != null && settingPanel.activeSelf)
+                settingPanel.SetActive(false);
+            else
+                OpenSetting();
         }
     }
 
     // --- [SOUND SYSTEM] ---
+
+    // ใช้สำหรับเสียงคลิก (OnClick) หรือเสียงกด Handle Slider
     public void PlayClickSound(AudioClip clip)
     {
-        if (sfxSource != null && clip != null) sfxSource.PlayOneShot(clip);
+        if (sfxSource != null && clip != null)
+            sfxSource.PlayOneShot(clip);
     }
 
+    // ใช้สำหรับเสียงตอนเอาเมาส์ไปชี้ปุ่ม (Hover)
     public void PlayHoverSound(AudioClip clip)
     {
-        if (sfxSource != null && clip != null) sfxSource.PlayOneShot(clip);
-    }
-
-    public void PlayHoverSoundStart(AudioClip clip)
-    {
-        if (sfxSource == null || clip == null) return;
-        sfxSource.clip = clip;
-        sfxSource.loop = false;
-        sfxSource.Play();
-    }
-
-    public void StopHoverSound()
-    {
-        if (sfxSource != null) sfxSource.Stop();
+        if (sfxSource != null && clip != null)
+            sfxSource.PlayOneShot(clip);
     }
 
     // --- [LIGHT SYSTEM] ---
@@ -141,7 +111,7 @@ public class MainMenuControl : MonoBehaviour
 
         while (time < fadeDuration)
         {
-            time += Time.unscaledDeltaTime;
+            time += Time.deltaTime;
             float t = Mathf.SmoothStep(0, 1, time / fadeDuration);
             if (targetLight != null) targetLight.intensity = Mathf.Lerp(startSpot, targetSpot, t);
             if (globalLight != null) globalLight.intensity = Mathf.Lerp(startGlobal, targetGlobal, t);
@@ -149,41 +119,31 @@ public class MainMenuControl : MonoBehaviour
         }
     }
 
-    // --- [BUTTON FUNCTIONS & SCENE CONTROL] ---
-    public void StartGame(string sceneName)
-    {
-        if (!isStarting && !string.IsNullOrEmpty(sceneName))
-        {
-            StartCoroutine(DelaySceneLoad(sceneName));
-        }
-    }
-
-    private IEnumerator DelaySceneLoad(string sceneName)
-    {
-        isStarting = true;
-        Time.timeScale = 1f;
-        yield return new WaitForSecondsRealtime(2.0f);
-        SceneManager.LoadScene(sceneName);
-    }
+    // --- [BUTTON FUNCTIONS] ---
 
     public void OpenSetting()
     {
         CloseAllPanels();
-        if (settingPanel != null)
-        {
-            settingPanel.SetActive(true);
-            Time.timeScale = 0f;
-        }
+        if (settingPanel != null) settingPanel.SetActive(true);
     }
 
-    public void CloseSetting()
+    public void OpenInformation()
     {
-        if (settingPanel != null) settingPanel.SetActive(false);
-        Time.timeScale = 1f;
+        CloseAllPanels();
+        if (informationPanel != null) informationPanel.SetActive(true);
     }
 
-    public void OpenInformation() { CloseAllPanels(); if (informationPanel != null) informationPanel.SetActive(true); }
-    public void OpenHowToPlay() { CloseAllPanels(); if (howToPlayPanel != null) howToPlayPanel.SetActive(true); }
+    public void OpenHowToPlay()
+    {
+        CloseAllPanels();
+        if (howToPlayPanel != null) howToPlayPanel.SetActive(true);
+    }
+
+    public void StartGame(string sceneName)
+    {
+        if (!string.IsNullOrEmpty(sceneName))
+            SceneManager.LoadScene(sceneName);
+    }
 
     public void QuitGame()
     {
@@ -195,17 +155,27 @@ public class MainMenuControl : MonoBehaviour
     }
 
     // --- [AUDIO SETUP & MIXER] ---
+
     private void SetupAudio()
     {
         float savedBgm = PlayerPrefs.GetFloat("BGMVolume", 0.5f);
-        if (bgmSlider != null) { bgmSlider.value = savedBgm / maxBgmVolume; bgmSlider.onValueChanged.AddListener(SetBGMVolume); }
-        ApplyBGMVolume(bgmSlider != null ? bgmSlider.value : (savedBgm / maxBgmVolume));
+        if (bgmSlider != null)
+        {
+            bgmSlider.value = savedBgm / maxBgmVolume;
+            bgmSlider.onValueChanged.AddListener(SetBGMVolume);
+        }
+        ApplyBGMVolume(bgmSlider != null ? bgmSlider.value : 1f);
 
         float savedSfx = PlayerPrefs.GetFloat("SFXVolume", 0.8f);
-        if (sfxSlider != null) { sfxSlider.value = savedSfx; sfxSlider.onValueChanged.AddListener(SetSFXVolume); }
+        if (sfxSlider != null)
+        {
+            sfxSlider.value = savedSfx;
+            sfxSlider.onValueChanged.AddListener(SetSFXVolume);
+        }
     }
 
     public void SetBGMVolume(float sliderValue) => ApplyBGMVolume(sliderValue);
+
     private void ApplyBGMVolume(float sliderValue)
     {
         float finalVolume = sliderValue * maxBgmVolume;
@@ -225,6 +195,5 @@ public class MainMenuControl : MonoBehaviour
         if (settingPanel != null) settingPanel.SetActive(false);
         if (informationPanel != null) informationPanel.SetActive(false);
         if (howToPlayPanel != null) howToPlayPanel.SetActive(false);
-        Time.timeScale = 1f;
     }
 }

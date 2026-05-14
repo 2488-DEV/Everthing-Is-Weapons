@@ -253,6 +253,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< HEAD
 --- !u!1001 &53244353
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -312,6 +313,10 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: f99ad940a071a07469cdd87030033d72, type: 3}
 --- !u!1001 &112759676
 PrefabInstance:
+=======
+--- !u!1 &94654257
+GameObject:
+>>>>>>> parent of fffcaaa (Merge remote-tracking branch 'origin/BIN' into JAMES)
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
@@ -539,6 +544,7 @@ Transform:
   - {fileID: 1586319292}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< HEAD
 --- !u!1001 &220893203
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -897,6 +903,8 @@ AudioSource:
   m_CorrespondingSourceObject: {fileID: 8297190100931364168, guid: da9bea058dc779948a8b74dcfbbb9ee1, type: 3}
   m_PrefabInstance: {fileID: 1035029440}
   m_PrefabAsset: {fileID: 0}
+=======
+>>>>>>> parent of fffcaaa (Merge remote-tracking branch 'origin/BIN' into JAMES)
 --- !u!1 &599804940
 GameObject:
   m_ObjectHideFlags: 0
@@ -1390,6 +1398,7 @@ SpriteRenderer:
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
+<<<<<<< HEAD
   m_Modification:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
@@ -1558,6 +1567,96 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5ad55c6a33825294f88eae8c1f728b15, type: 3}
+=======
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -15.76, y: -5.21, z: 0}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &907937530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 907937527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b168265766e7fbe4e8c5012d32361b23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 907937532}
+  flip: {fileID: 907937529}
+  moveInputX: 0
+  moveInputY: 0
+  moveSpeed: 10
+--- !u!50 &907937532
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 907937527}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 3.51
+  m_AngularDamping: 0
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
+--- !u!70 &907937533
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 907937527}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0.2604952, y: -0.7273817}
+  m_Size: {x: 1.1990097, y: 1.6652368}
+  m_Direction: 0
+>>>>>>> parent of fffcaaa (Merge remote-tracking branch 'origin/BIN' into JAMES)
 --- !u!1 &1184203020
 GameObject:
   m_ObjectHideFlags: 0
@@ -2466,6 +2565,7 @@ SceneRoots:
   - {fileID: 1744099185}
   - {fileID: 2134052056}
   - {fileID: 12772939}
+<<<<<<< HEAD
   - {fileID: 220893203}
   - {fileID: 1035029440}
   - {fileID: 53244353}
@@ -2477,3 +2577,5 @@ SceneRoots:
   - {fileID: 1285958327}
   - {fileID: 112759676}
   - {fileID: 463356438}
+=======
+>>>>>>> parent of fffcaaa (Merge remote-tracking branch 'origin/BIN' into JAMES)
