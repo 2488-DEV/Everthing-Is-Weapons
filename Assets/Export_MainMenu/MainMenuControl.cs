@@ -43,6 +43,7 @@ public class MainMenuControl : MonoBehaviour
     {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> parent of 107149d (Revert "Backup (for new one)")
         // [อัปเดตเพิ่ม] ถ้ากลับมาหน้า MainMenu ให้สั่งทำลายเพลงต่อเนื่อง (GlobalBGM) ทิ้งทันที
@@ -53,6 +54,9 @@ public class MainMenuControl : MonoBehaviour
         }
 
         // [ส่วนเดิม] ค้นหา Object "GlobalBGM" เพื่อให้ Slider ยังคุมเสียงต่อเนื่องได้
+=======
+        // [อัปเดตใหม่] ค้นหา Object "GlobalBGM" เพื่อให้ Slider ยังคุมเสียงต่อเนื่องได้
+>>>>>>> parent of 2630bc0 (Backup (for new one))
         if (bgmSource == null)
         {
             GameObject bgmObj = GameObject.Find("GlobalBGM");
@@ -199,4 +203,4 @@ public class MainMenuControl : MonoBehaviour
         if (informationPanel != null) informationPanel.SetActive(false);
         if (howToPlayPanel != null) howToPlayPanel.SetActive(false);
     }
-}
+}                                               
