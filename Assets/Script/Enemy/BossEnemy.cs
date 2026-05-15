@@ -115,12 +115,31 @@ public class BossEnemy : MonoBehaviour
 
                 if (attackTimer <= 0)
                 {
-                    ChooseBossMove();
+                    if (this.name == "Boss")
+                    {
+                        ChooseBossMove();
+                    }
+                    else if (this.name == "DogBoss")
+                    {
+                        ChooseDogBossMove();
+                    }
                 }
             }
         }
     }
+    void ChooseDogBossMove()
+    {
+        float playerRange = Vector2.Distance(transform.position, playerTransform.position);
 
+        if (playerRange > 5f)
+        {
+            if (Random.value > 0.5f) DogBossFirstMove();
+        }
+        else
+        {
+            StartCoroutine(DogBossJumpSlamMoveCoroutine());
+        }
+    }
     void ChooseBossMove()
     {
         float playerRange = Vector2.Distance(transform.position, playerTransform.position);
@@ -135,7 +154,23 @@ public class BossEnemy : MonoBehaviour
             StartCoroutine(BossSlamMoveCoroutine());
         }
     }
+    void DogBossFirstMove()
+    {
+        isAttacking = true;
+        GameObject paperPrefab = System.Array.Find(VFX, go => go != null && go.name.Contains("Paper"));
 
+        if (paperPrefab != null)
+        {
+            GameObject projectile = Instantiate(paperPrefab, transform.position, Quaternion.identity);
+            projectile.SetActive(true);
+            Vector2 shootDirection = (Vector2)playerTransform.position - (Vector2)transform.position;
+
+            PaperProjectile paperScript = projectile.GetComponent<PaperProjectile>();
+            if (paperScript != null) paperScript.SetDirection(shootDirection);
+        }
+
+        FinishAttack(2f);
+    }
     void BossFirstMove()
     {
         isAttacking = true;
@@ -186,7 +221,44 @@ public class BossEnemy : MonoBehaviour
         isDashing = false;
         FinishAttack(2f);
     }
+    IEnumerator DogBossJumpSlamMoveCoroutine()
+    {
+        isAttacking = true;
+        if (hitBox.Length > 1 && hitBox[0] != null)
+        {
+            GameObject circle = Instantiate(hitBox[1], transform.position, Quaternion.identity, transform);
+            circle.transform.localScale = new Vector3(slamRadius * 2, slamRadius * 2, 1);
+            circle.SetActive(true);
+            activeWarnings.Add(circle);
+            yield return new WaitForSeconds(slamWarningDuration);
+            activeWarnings.Remove(circle);
+            Destroy(circle);
+        }
 
+        Vector3 oldScale = transform.localScale;
+        transform.localScale = new Vector3(oldScale.x * 1.3f, oldScale.y * 0.6f, oldScale.z);
+        yield return new WaitForSeconds(0.15f);
+        transform.localScale = oldScale;
+
+        if (Vector2.Distance(transform.position, playerTransform.position) <= slamRadius)
+        {
+            if (player != null)
+            {
+                player.health -= attackDamage;
+                player.ApplyKnockback(transform.position, 3f, 0.15f);
+            }
+        }
+
+        GameObject smokePrefab = System.Array.Find(VFX, go => go != null && go.name.Contains("Smoke"));
+        if (smokePrefab != null)
+        {
+            GameObject smoke = Instantiate(smokePrefab, transform.position, Quaternion.identity);
+            smoke.SetActive(true);
+            StartCoroutine(SmokeEffectCoroutine(smoke));
+        }
+
+        FinishAttack(2f);
+    }
     IEnumerator BossSlamMoveCoroutine()
     {
         isAttacking = true;

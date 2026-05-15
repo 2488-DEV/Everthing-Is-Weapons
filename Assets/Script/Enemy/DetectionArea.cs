@@ -28,7 +28,6 @@ public class DetectionArea : MonoBehaviour
             else
             {
                 playerDetect = false;
-                handDetect = false; // ปิดการจับมือ/อาวุธด้วย
                 isExit = false;
                 timer = exitDelay;
             }
@@ -59,12 +58,6 @@ public class DetectionArea : MonoBehaviour
                (transform.parent.name.Contains("BlackGuy") || transform.parent.CompareTag("Enemy")))
             {
                 isExit = true;
-            }
-            else
-            {
-                // ถ้าเป็นลูกกระจ๊อกทั่วไป ให้เลิกตามทันที
-                playerDetect = false;
-                handDetect = false;
             }
         }
     }
