@@ -64,6 +64,7 @@ public class Player : MonoBehaviour
     private float baseAngle;
     private bool isMouseOnLeft;
     private bool attackFacingLeft;
+    private bool rangedThrown;
 
     void Start()
     {
@@ -181,13 +182,15 @@ public class Player : MonoBehaviour
 
     public void Attack()
     {
-        if (weaponHandlerScript == null || weaponHandlerScript.currentWeapon == null)
+        bool hasWeapon = weaponHandlerScript != null && weaponHandlerScript.currentWeapon != null;
+
+        if (weaponHandlerScript == null || (!hasWeapon && attackTimer <= 0))
         {
             ResetAttack();
             return;
         }
 
-        if (weaponHandlerScript.currentWeapon.weaponType == WeaponInfo.WeaponType.Melee)
+        if (hasWeapon && weaponHandlerScript.currentWeapon.weaponType == WeaponInfo.WeaponType.Melee)
         {
             if (Input.GetMouseButtonDown(0) && attackTimer <= 0)
             {
@@ -201,7 +204,7 @@ public class Player : MonoBehaviour
             if (attackTimer > 0)
             {
                 attackTimer -= Time.deltaTime;
-                float progress = 1f - (attackTimer / attackTime); // 0 → 1 over the attack
+                float progress = 1f - (attackTimer / attackTime);
                 float windUpEnd = 0.10f;
                 float swingEnd = 0.30f;
                 float startOffset = attackFacingLeft ? -90f : 90f;
@@ -210,14 +213,12 @@ public class Player : MonoBehaviour
 
                 if (progress < windUpEnd)
                 {
-                    // Phase 1: wind-up — pull the hand back
                     float t = Mathf.SmoothStep(0f, 1f, progress / windUpEnd);
                     currentOffset = Mathf.Lerp(0f, startOffset, t);
                     HitBox.gameObject.SetActive(false);
                 }
                 else if (progress < swingEnd)
                 {
-                    // Phase 2: swing — fast strike through the target
                     float t = (progress - windUpEnd) / (swingEnd - windUpEnd);
                     t = t * t * (3f - 2f * t);
                     currentOffset = Mathf.Lerp(startOffset, endOffset, t);
@@ -225,7 +226,6 @@ public class Player : MonoBehaviour
                 }
                 else
                 {
-                    // Phase 3: recovery — settle at the end
                     float t = Mathf.SmoothStep(0f, 1f, (progress - swingEnd) / (1f - swingEnd));
                     currentOffset = Mathf.Lerp(endOffset, 0f, t);
                     HitBox.gameObject.SetActive(false);
@@ -238,26 +238,61 @@ public class Player : MonoBehaviour
                 HitBox.gameObject.SetActive(false);
             }
         }
-        if (weaponHandlerScript.currentWeapon.weaponType == WeaponInfo.WeaponType.Range)
+
+        // Ranged attack (handles both pre-throw and post-throw animation)
+        if ((hasWeapon && weaponHandlerScript.currentWeapon.weaponType == WeaponInfo.WeaponType.Range) || (!hasWeapon && attackTimer > 0 && rangedThrown))
         {
-            if (Input.GetMouseButtonDown(0) && attackTimer <= 0)
+            if (hasWeapon && Input.GetMouseButtonDown(0) && attackTimer <= 0)
             {
                 attackTimer = attackTime;
-
-                WeaponInfo thrownWeapon = weaponHandlerScript.currentWeapon;
-                SpawnProjectile(thrownWeapon);
-
-                weaponHandlerScript.ThrowWeapon();
+                attackFacingLeft = isMouseOnLeft;
+                baseAngle = GetMouseAngle() + (attackFacingLeft ? 180f : 0f);
+                rangedThrown = false;
             }
 
             if (attackTimer > 0)
+            {
                 attackTimer -= Time.deltaTime;
+                float progress = 1f - (attackTimer / attackTime);
+                float windUpEnd = 0.20f;
+                float startOffset = attackFacingLeft ? -90f : 90f;
+                float currentOffset;
+
+                if (progress < windUpEnd)
+                {
+                    // Phase 1: wind-up — pull hand back
+                    float t = Mathf.SmoothStep(0f, 1f, progress / windUpEnd);
+                    currentOffset = Mathf.Lerp(0f, startOffset, t);
+                }
+                else if (!rangedThrown)
+                {
+                    // Spawn projectile at the peak of wind-up
+                    if (hasWeapon)
+                    {
+                        WeaponInfo thrownWeapon = weaponHandlerScript.currentWeapon;
+                        SpawnProjectile(thrownWeapon);
+                        weaponHandlerScript.ThrowWeapon();
+                        hasWeapon = false;
+                    }
+                    rangedThrown = true;
+                    currentOffset = startOffset;
+                }
+                else
+                {
+                    // Phase 3: recovery — hand returns to neutral
+                    float t = Mathf.SmoothStep(0f, 1f, (progress - windUpEnd) / (1f - windUpEnd));
+                    currentOffset = Mathf.Lerp(startOffset, 0f, t);
+                }
+
+                handTransform.rotation = Quaternion.Euler(0, 0, baseAngle + currentOffset);
+            }
         }
     }
 
     public void ResetAttack()
     {
         attackTimer = 0;
+        rangedThrown = false;
         if (HitBox != null) HitBox.gameObject.SetActive(false);
         handTransform.rotation = Quaternion.identity;
     }
@@ -280,6 +315,7 @@ public class Player : MonoBehaviour
         SpriteRenderer sr = projObj.AddComponent<SpriteRenderer>();
         sr.sprite = weapon.itemModel;
         sr.sortingOrder = 5;
+        projObj.transform.localScale = weaponHandler.lossyScale;
         if (weapon.itemModel == null)
         {
             sr.color = Color.red;
@@ -293,15 +329,22 @@ public class Player : MonoBehaviour
         CircleCollider2D col = projObj.AddComponent<CircleCollider2D>();
         col.isTrigger = true;
         col.radius = 0.3f;
-        col.enabled = false;
+
+        // Ignore "for cam" and any camera-related colliders
+        foreach (GameObject go in GameObject.FindObjectsOfType<GameObject>())
+        {
+            if (go.name.IndexOf("cam", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                foreach (Collider2D c in go.GetComponents<Collider2D>())
+                    Physics2D.IgnoreCollision(col, c);
+            }
+        }
 
         float totalDamage = attackDamage * (1f + (bonusAttackDamage / 100f));
 
         ThrowableProjectile proj = projObj.AddComponent<ThrowableProjectile>();
-        proj.Setup(direction, weapon.projectileSpeed, totalDamage, 3f, 0.15f,
-            weapon.projectileLifetime);
-
-        Debug.Log("[Ranged] Projectile spawned at " + projObj.transform.position + " dir=" + direction + " speed=" + weapon.projectileSpeed);
+        proj.lifetime = weapon.projectileLifetime;
+        proj.Setup(direction, weapon.projectileSpeed, totalDamage);
     }
 
     public void ApplyKnockback(Vector3 attackerPos, float force, float duration)

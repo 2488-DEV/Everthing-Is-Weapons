@@ -2,36 +2,38 @@ using UnityEngine;
 
 public class ThrowableProjectile : MonoBehaviour
 {
+    [Header("Flight")]
     public float speed = 15f;
+    public float spinSpeed = 720f;
+    public float lifetime = 5f;
+
+    [Header("Damage")]
     public float damage;
-    public float knockbackForce = 3f;
-    public float knockbackDuration = 0.15f;
-    public float lifetime = 3f;
+
+    [Header("Bounce & Fade")]
+    public float bounceForce = 8f;
+    public float fadeDuration = 1.5f;
 
     private Vector2 moveDirection;
     private float timer;
-    private float colliderEnableTime = 0.1f;
-    private Collider2D myCollider;
+    private bool hasHit;
+    private bool isFading;
+    private float fadeTimer;
+    private SpriteRenderer sr;
+    private Rigidbody2D rb;
+    private Collider2D col;
 
     void Awake()
     {
-        myCollider = GetComponent<Collider2D>();
+        rb = GetComponent<Rigidbody2D>();
+        col = GetComponent<Collider2D>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
-    void Start()
-    {
-        Debug.Log("[Projectile] Alive at " + transform.position);
-    }
-
-    public void Setup(Vector2 direction, float speed, float damage, float knockbackForce,
-        float knockbackDuration, float lifetime)
+    public void Setup(Vector2 direction, float speed, float damage)
     {
         this.speed = speed;
         this.damage = damage;
-        this.knockbackForce = knockbackForce;
-        this.knockbackDuration = knockbackDuration;
-        this.lifetime = lifetime;
-
         moveDirection = direction.normalized;
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -40,37 +42,35 @@ public class ThrowableProjectile : MonoBehaviour
 
     void Update()
     {
-        transform.Translate(moveDirection * speed * Time.deltaTime, Space.World);
-
-        if (myCollider != null && !myCollider.enabled)
+        if (!hasHit)
         {
-            colliderEnableTime -= Time.deltaTime;
-            if (colliderEnableTime <= 0)
-            {
-                myCollider.enabled = true;
-                Debug.Log("[Projectile] Collider enabled");
-            }
+            transform.Translate(moveDirection * speed * Time.deltaTime, Space.World);
+            transform.Rotate(0, 0, -spinSpeed * Time.deltaTime);
+
+            timer += Time.deltaTime;
+            if (timer >= lifetime)
+                StartFadeOut();
         }
 
-        timer += Time.deltaTime;
-        if (timer >= lifetime)
-            Destroy(gameObject);
-    }
+        if (isFading)
+        {
+            fadeTimer += Time.deltaTime;
+            float alpha = 1f - Mathf.Clamp01(fadeTimer / fadeDuration);
+            if (sr != null)
+            {
+                Color c = sr.color;
+                c.a = alpha;
+                sr.color = c;
+            }
 
-    void OnDestroy()
-    {
-        Debug.Log("[Projectile] Destroyed at " + transform.position);
+            if (fadeTimer >= fadeDuration)
+                Destroy(gameObject);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("[Projectile] TriggerEnter with: " + collision.name + " tag=" + collision.tag);
-
-        if (collision.CompareTag("Player") || collision.CompareTag("Hand") || collision.CompareTag("Weapon") || collision.CompareTag("PlayerAttackHitBox"))
-        {
-            Debug.Log("[Projectile] Ignored (player-related)");
-            return;
-        }
+        if (hasHit) return;
 
         if (collision.CompareTag("Enemy"))
         {
@@ -86,10 +86,29 @@ public class ThrowableProjectile : MonoBehaviour
 
                 enemy.SendMessage("ApplyKnockback", transform.position, SendMessageOptions.DontRequireReceiver);
             }
-        }
 
-        Debug.Log("[Projectile] Destroyed by: " + collision.name + " tag=" + collision.tag);
-        Destroy(gameObject);
+            StartBounce();
+        }
+    }
+
+    void StartBounce()
+    {
+        hasHit = true;
+        col.enabled = false;
+
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.gravityScale = 2f;
+        rb.linearVelocity = Vector2.up * bounceForce;
+        rb.constraints = RigidbodyConstraints2D.None;
+
+        StartFadeOut();
+    }
+
+    void StartFadeOut()
+    {
+        if (isFading) return;
+        isFading = true;
+        fadeTimer = 0;
     }
 
     private MonoBehaviour FindEnemyComponent(Collider2D collision)
