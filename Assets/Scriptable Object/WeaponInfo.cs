@@ -15,6 +15,9 @@ public class WeaponInfo : ScriptableObject
     
     public float attackSpeed;
     public float attackReach;
-    public float MaxDurability => 
+    [Header("Ranged")]
+    public float projectileSpeed = 15f;
+    public float projectileLifetime = 3f;
+    public float MaxDurability =>
         baseDurability + (weaponRarity != null ? weaponRarity.rarityDurability : 0);
 }

@@ -45,17 +45,32 @@ public class WeaponHandler : MonoBehaviour
         }
     }
 
+    public void ThrowWeapon()
+    {
+        if (currentWeapon == null) return;
+
+        Debug.Log($"<color=orange>[System]</color> Threw <color=yellow>{currentWeapon.weaponName}</color>!");
+
+        currentWeapon = null;
+        currentRarity = null;
+        currentDurability = 0;
+
+        Player player = GetComponentInParent<Player>();
+        if (player != null)
+            player.ResetAttack();
+
+        UpdateWeaponVisual();
+    }
+
     void BreakWeapon()
     {
         if (currentWeapon == null) return;
 
         Debug.Log($"<color=orange>[System]</color> <color=red>{currentWeapon.weaponName} พังยับเยิน!</color>");
 
-        // เคลียร์ข้อมูลอาวุธ
         currentWeapon = null;
         currentRarity = null;
 
-        // สั่ง Reset สถานะผู้เล่น
         Player player = GetComponentInParent<Player>();
         if (player != null)
         {
