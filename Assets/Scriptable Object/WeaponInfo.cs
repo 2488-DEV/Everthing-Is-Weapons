@@ -3,6 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "WeaponInfo", menuName = "Scriptable Objects/WeaponInfo")]
 public class WeaponInfo : ScriptableObject
 {
+    public float pitch;
     public string weaponName;
     public float baseDamage; 
     public float baseDurability; 

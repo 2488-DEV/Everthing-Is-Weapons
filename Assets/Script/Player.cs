@@ -15,7 +15,6 @@ public class Player : MonoBehaviour
         }
         else
         {
-            // ถ้ามีตัวเก่าอยู่แล้ว ทำลายตัวใหม่ทิ้งทันที
             Destroy(gameObject);
             return;
         }
@@ -29,7 +28,7 @@ public class Player : MonoBehaviour
     public Rigidbody2D rb;
     public Animator animator;
     public WeaponHandler weaponHandlerScript;
-    public GameObject selectionUI; // ตัวนี้จะถูกอัปเดตอัตโนมัติถ้าหลุด
+    public GameObject selectionUI;
 
     [Header("Movement Settings")]
     public float speed = 5f;
@@ -54,6 +53,15 @@ public class Player : MonoBehaviour
     public float bonusAttackDamage;
     public float bonusAttackSpeed;
 
+    [Header("Audio Settings")]
+    public AudioClip pickupSound;
+
+    [Header("End Game Panels")] // --- [ส่วนที่อัปเดตใหม่] ---
+    [Tooltip("ลาก DeadPanel มาใส่ที่นี่")]
+    public GameObject deadPanel;
+    [Tooltip("ลาก VictoryPanel มาใส่ที่นี่")]
+    public GameObject victoryPanel;
+
     [Header("State Flags")]
     public bool isHand;
     public bool isSelecting;
@@ -66,25 +74,27 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        RefreshReferences(); // เรียกใช้การหา Reference เริ่มต้น
+        RefreshReferences();
 
         if (characterParts.Length > 4) handSR = characterParts[4];
         weaponSR = weaponHandler.GetComponent<SpriteRenderer>();
         weaponHandlerScript = weaponHandler.GetComponent<WeaponHandler>();
 
         health = maxHealth + bonusHealth;
+
+        // ปิด Panel ไว้ก่อนเริ่มเกมกันพลาด
+        if (deadPanel != null) deadPanel.SetActive(false);
+        if (victoryPanel != null) victoryPanel.SetActive(false);
     }
 
     void Update()
     {
         if (isDead) return;
 
-        // --- ส่วนที่แก้ไข: "ฉลาดข้ามฉาก" เช็ก Reference ที่อาจพังเมื่อเปลี่ยน Scene ---
         if (mainCam == null) mainCam = Camera.main;
 
         if (selectionUI == null || !selectionUI.activeInHierarchy)
         {
-            // พยายามหา UI ใหม่ในฉาก (ตรวจสอบว่า Canvas ในฉากใหม่มีชื่อ InGameUI หรือไม่)
             GameObject foundUI = GameObject.Find("InGameUI");
             if (foundUI != null) selectionUI = foundUI;
         }
@@ -110,11 +120,36 @@ public class Player : MonoBehaviour
         }
     }
 
-    // ฟังก์ชันช่วยหา Reference ใหม่เวลาเปลี่ยนด่าน
     void RefreshReferences()
     {
         mainCam = Camera.main;
         if (selectionUI == null) selectionUI = GameObject.Find("InGameUI");
+    }
+
+    void Pickup()
+    {
+        if (weaponNew == null) return;
+
+        if (MainMenuControl.instance != null && pickupSound != null)
+        {
+            MainMenuControl.instance.PlaySFXWithPitch(pickupSound);
+        }
+
+        WeaponInfo groundData = weaponNew.weaponData;
+        WeaponRarity groundRarity = weaponNew.weaponRarity;
+        float groundDurability = weaponNew.currentDurability;
+
+        WeaponInfo handData = weaponHandlerScript.currentWeapon;
+        WeaponRarity handRarity = weaponHandlerScript.currentRarity;
+        float handDurability = weaponHandlerScript.currentDurability;
+
+        weaponHandlerScript.SetWeapon(groundData, groundRarity, groundDurability);
+        attackTime = groundData.attackSpeed * (1 - (bonusAttackSpeed / 100));
+        attackDamage = groundData.baseDamage + groundRarity.rarityDamage;
+        HitBox.localScale = new Vector3(0.5f, groundData.attackReach / 1.2f, 0.5f);
+
+        if (handData != null) weaponNew.SetWeapon(handData, handRarity, handDurability);
+        else Destroy(weaponNew.gameObject);
     }
 
     void HandleStatsAndExperience()
@@ -134,10 +169,32 @@ public class Player : MonoBehaviour
         }
     }
 
+    // --- [ฟังก์ชันตาย: เปิด Dead Panel] ---
     void Die()
     {
+        if (isDead) return;
         isDead = true;
         Debug.Log("<color=red>Player HAS DIED!</color>");
+
+        if (deadPanel != null)
+        {
+            deadPanel.SetActive(true);
+            Time.timeScale = 0f; // หยุดเวลาเกม
+        }
+    }
+
+    // --- [ฟังก์ชันชนะ: เปิด Victory Panel] ---
+    // นายสามารถเรียกฟังก์ชันนี้จากสคริปต์อื่นได้ เช่น มอนสเตอร์ตายหมด หรือเข้าเส้นชัย
+    public void Victory()
+    {
+        if (isDead) return;
+        Debug.Log("<color=green>VICTORY!</color>");
+
+        if (victoryPanel != null)
+        {
+            victoryPanel.SetActive(true);
+            Time.timeScale = 0f; // หยุดเวลาเกม
+        }
     }
 
     IEnumerator LevelUpRoutine()
@@ -149,7 +206,6 @@ public class Player : MonoBehaviour
             level += 1;
             maxEXP *= 1.25f;
 
-            // ตรวจสอบ selectionUI อีกครั้งกันพลาด
             if (selectionUI == null) selectionUI = GameObject.Find("InGameUI");
 
             if (selectionUI != null)
@@ -245,25 +301,6 @@ public class Player : MonoBehaviour
         Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
         Vector3 direction = mousePos - handTransform.position;
         return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-    }
-
-    void Pickup()
-    {
-        if (weaponNew == null) return;
-        WeaponInfo groundData = weaponNew.weaponData;
-        WeaponRarity groundRarity = weaponNew.weaponRarity;
-        float groundDurability = weaponNew.currentDurability;
-        WeaponInfo handData = weaponHandlerScript.currentWeapon;
-        WeaponRarity handRarity = weaponHandlerScript.currentRarity;
-        float handDurability = weaponHandlerScript.currentDurability;
-
-        weaponHandlerScript.SetWeapon(groundData, groundRarity, groundDurability);
-        attackTime = groundData.attackSpeed * (1 - (bonusAttackSpeed / 100));
-        attackDamage = groundData.baseDamage + groundRarity.rarityDamage;
-        HitBox.localScale = new Vector3(0.5f, groundData.attackReach / 1.2f, 0.5f);
-
-        if (handData != null) weaponNew.SetWeapon(handData, handRarity, handDurability);
-        else Destroy(weaponNew.gameObject);
     }
 
     void HandleFlipAndMovementLogic()

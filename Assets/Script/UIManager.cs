@@ -9,15 +9,19 @@ public class UIManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+
+            // --- [ส่วนที่เพิ่มเพื่อแก้ปัญหาห้อง 2] ---
+            // สั่งให้ตัวเองออกจาก Parent (Canvas) ทันที 
+            // เพื่อให้ DontDestroyOnLoad ทำงานได้จริง
+            transform.SetParent(null);
+
             DontDestroyOnLoad(gameObject);
         }
         else
         {
-            // ถ้าไม่ใช่ตัวจริง ให้ปิด Object ทิ้งทันที (เผื่อการ Destroy ใช้เวลานิดหน่อย)
-            // แล้วค่อยสั่ง Destroy เพื่อลบขยะออกจากฉาก
+            // ถ้ามีตัวเกินมา (เช่น ในฉากห้อง 2 นายเผลอวางทิ้งไว้) ให้ลบทิ้ง
             gameObject.SetActive(false);
             Destroy(gameObject);
-            return;
         }
     }
 }

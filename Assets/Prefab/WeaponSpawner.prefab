@@ -52,13 +52,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a5037c3c643d9934890ab42375749cbc, type: 2}
   - {fileID: 11400000, guid: be75acbe97b45f04487cf64cb1acf18a, type: 2}
   - {fileID: 11400000, guid: 8880957f079fcee4c9c387435abc6bcd, type: 2}
-  - {fileID: 11400000, guid: 399f9de713708a44c8d8e47bd5f4cf6e, type: 2}
   rarityPool:
   - {fileID: 11400000, guid: 062cbe3740293084792ed6de78e2a4b3, type: 2}
   - {fileID: 11400000, guid: d72b51601503c2643acf2adc310fe1b7, type: 2}
   - {fileID: 11400000, guid: f8491d04bb52a584883d5f279bcf86f6, type: 2}
   - {fileID: 11400000, guid: f46d9c46981dca0489245aa12966e150, type: 2}
   - {fileID: 11400000, guid: 3e3478cedce4bc142ae631ac2e33ec11, type: 2}
+  emptyChance: 0.3
 --- !u!212 &6021214369450143287
 SpriteRenderer:
   m_ObjectHideFlags: 0
