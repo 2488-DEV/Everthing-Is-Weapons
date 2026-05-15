@@ -34,7 +34,6 @@ public class PlayerSceneController : MonoBehaviour
         hasTriggered = true;
         Debug.Log("[System] เข้าประตู! กำลังคำนวณด่านถัดไป...");
 
-        // เรียกใช้ Logic จาก InGameScript ที่เราอัปเกรดไว้
         InGameScript.NextStage();
     }
 

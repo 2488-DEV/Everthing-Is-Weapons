@@ -1,30 +1,28 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public static class InGameScript
+public class InGameScript
 {
-    public static int currentStage = 0;
+    public static int currentStage = 0; 
     public static int enemyCount = 0;
-
-    // ตั้งชื่อให้ตรงกับ Scene ใน Build Settings ของนาย
 
     public static void NextStage()
     {
-        if (currentStage == 0)
+        if (currentStage != 0)
         {
-            currentStage = 1;
-            enemyCount = 3;
+            enemyCount = (int)(enemyCount * 1.05f);
+            currentStage += 1;
+            Debug.Log("Stage : " + currentStage);
         }
         else
         {
-            currentStage++;
-            enemyCount = Mathf.CeilToInt(enemyCount * 1.1f) + 1;
+            currentStage += 1;
+            enemyCount = 3;
+            Debug.Log("Stage : " + currentStage);
         }
-    }
-
+    } 
     public static void ResetGame()
     {
-        currentStage = 1;
-        enemyCount = 3;
+        currentStage = 0;
+        enemyCount = 0;
     }
 }
