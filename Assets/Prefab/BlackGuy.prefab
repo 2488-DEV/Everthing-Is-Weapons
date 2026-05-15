@@ -219,7 +219,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -544734455
-  m_SortingLayer: 1
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 9159886069550649499, guid: f1d412cd3abb7964e98cd69282cdb11a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -310,24 +310,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyInfo: {fileID: 11400000, guid: f90ad7205bcead442942b550d9bed71d, type: 2}
   weaponHandler: {fileID: 8199470793020797650, guid: b74550e8711140644a904043315afbad, type: 3}
-  playerDetect: 0
   DetectionArea: {fileID: 4038173525255805343}
-  isGettingHit: 0
-  hitArea: 0
-  health: 0
-  attackDamage: 0
   AttackArea: {fileID: 6526798114721928200}
   Sense: {fileID: 8279698857226457503}
   Hand: {fileID: 8769564776635542963}
   handSpeed: 5
   waitTimer: 1
-  Timer: 0
-  attackTimer: 0
-  expGiven: 0
   knockbackForce: 2000
   offsetY: 1
-  weaponHandlerScript: {fileID: 6523492119523214575, guid: b74550e8711140644a904043315afbad, type: 3}
-  playerTransform: {fileID: 0}
+  health: 0
+  maxHealth: 0
+  attackDamage: 0
+  expGiven: 0
+  Timer: 0
+  attackTimer: 0
+  playerDetect: 0
+  isGettingHit: 0
+  hitArea: 0
 --- !u!1 &6209781249424885655
 GameObject:
   m_ObjectHideFlags: 0
@@ -411,6 +410,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerDetect: 0
   handDetect: 0
+  exitDelay: 1
   isExit: 0
 --- !u!1 &8279698857226457503
 GameObject:
@@ -574,7 +574,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1527281339
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 2
   m_Sprite: {fileID: -8166936171628584809, guid: f1d412cd3abb7964e98cd69282cdb11a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -617,7 +617,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

@@ -55,7 +55,7 @@ public class DetectionArea : MonoBehaviour
             // เช็กว่าศัตรูตัวนี้ต้องการระบบหน่วงเวลาไหม (เช่น BlackEnemy หรือ Boss)
             // วิธีที่ปลอดภัยกว่าการเช็กชื่อคือการเช็ก Tag ของ Parent หรือใช้ตัวแปรคุมครับ
             if (transform.parent != null &&
-               (transform.parent.name.Contains("BlackGuy") || transform.parent.CompareTag("Enemy")))
+               (transform.parent.name == "BlackGuy" || transform.parent.name == "Spider"))
             {
                 isExit = true;
             }

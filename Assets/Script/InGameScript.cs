@@ -3,8 +3,8 @@ using UnityEngine.SceneManagement;
 
 public static class InGameScript
 {
-    public static int currentStage = 1;
-    public static int enemyCount = 3;
+    public static int currentStage = 0;
+    public static int enemyCount = 0;
 
     // ตั้งชื่อให้ตรงกับ Scene ใน Build Settings ของนาย
     private static string[] stageScenes = { "inGame_1", "inGame_2", "inGame_3", "inGame_4", "inGame_5" };

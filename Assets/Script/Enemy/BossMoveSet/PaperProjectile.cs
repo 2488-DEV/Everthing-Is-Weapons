@@ -4,6 +4,7 @@ public class PaperProjectile : MonoBehaviour
 {
     public float speed = 10f;
     public float damage = 10f;
+    public float spinSpeed = 360f;
     private Vector2 moveDirection;
 
     // ฟังก์ชันสำหรับตั้งค่าทิศทางจากตัวบอส
@@ -19,6 +20,11 @@ public class PaperProjectile : MonoBehaviour
     void Update()
     {
         transform.Translate(moveDirection * speed * Time.deltaTime, Space.World);
+
+        if (name.Contains("Bone"))
+        {
+            transform.Rotate(0, 0, spinSpeed * Time.deltaTime);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
