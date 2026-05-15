@@ -61,6 +61,15 @@ public class Player : MonoBehaviour
     public ItemPickup weaponNew;
     public bool isDead = false;
 
+    [Header("Audio")]
+    public AudioClip swingSound;
+    public AudioClip[] footstepSounds;
+    public AudioClip equipSound;
+    public float footstepInterval = 0.4f;
+
+    private float footstepTimer;
+    private int lastFootstepIndex;
+
     private float baseAngle;
     private bool isMouseOnLeft;
     private bool attackFacingLeft;
@@ -103,6 +112,7 @@ public class Player : MonoBehaviour
         }
 
         HandleFlipAndMovementLogic();
+        HandleFootstepSounds();
         HandleStatsAndExperience();
         Attack();
 
@@ -134,6 +144,35 @@ public class Player : MonoBehaviour
         {
             StartCoroutine(LevelUpRoutine());
         }
+    }
+
+    void HandleFootstepSounds()
+    {
+        if (footstepSounds == null || footstepSounds.Length == 0) return;
+
+        if (moveInput != Vector2.zero)
+        {
+            footstepTimer -= Time.deltaTime;
+            if (footstepTimer <= 0)
+            {
+                footstepTimer = footstepInterval;
+                PlayFootstep();
+            }
+        }
+        else
+        {
+            footstepTimer = 0;
+        }
+    }
+
+    void PlayFootstep()
+    {
+        if (footstepSounds.Length == 0) return;
+
+        lastFootstepIndex = (lastFootstepIndex + 1) % footstepSounds.Length;
+        AudioClip clip = footstepSounds[lastFootstepIndex];
+        if (SoundManagers.instance != null)
+            SoundManagers.instance.PlayFootstep(clip);
     }
 
     void Die()
@@ -199,6 +238,9 @@ public class Player : MonoBehaviour
                 attackFacingLeft = isMouseOnLeft;
                 baseAngle = GetMouseAngle() + (attackFacingLeft ? 180f : 0f);
                 weaponHandlerScript.DecreaseDurability(1f);
+
+                if (SoundManagers.instance != null)
+                    SoundManagers.instance.PlaySFX(swingSound);
             }
 
             if (attackTimer > 0)
@@ -389,6 +431,9 @@ public class Player : MonoBehaviour
         attackTime = groundData.attackSpeed * (1 - (bonusAttackSpeed / 100));
         attackDamage = groundData.baseDamage + groundRarity.rarityDamage;
         HitBox.localScale = new Vector3(0.5f, groundData.attackReach / 1.2f, 0.5f);
+
+        if (SoundManagers.instance != null)
+            SoundManagers.instance.PlaySFX(equipSound);
 
         if (handData != null) weaponNew.SetWeapon(handData, handRarity, handDurability);
         else Destroy(weaponNew.gameObject);
