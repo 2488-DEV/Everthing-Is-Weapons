@@ -2,67 +2,88 @@ using UnityEngine;
 
 public class WeaponHandler : MonoBehaviour
 {
+    [Header("Current Weapon Data")]
     public WeaponInfo currentWeapon;
     public WeaponRarity currentRarity;
-    private SpriteRenderer sr;
-    
     public float currentDurability;
 
-    // สร้างเป็น Property เพื่อให้เรียกใช้ง่ายและคำนวณค่าใหม่เสมอ
-    public float MaxDurability => (currentWeapon != null) 
-        ? currentWeapon.baseDurability + (currentRarity != null ? currentRarity.rarityDurability : 0) 
+    [Header("Visuals")]
+    private SpriteRenderer sr;
+
+    // Property คำนวณค่าความทนทานสูงสุดเสมอ
+    public float MaxDurability => (currentWeapon != null)
+        ? currentWeapon.baseDurability + (currentRarity != null ? currentRarity.rarityDurability : 0)
         : 0;
+
+    void Awake()
+    {
+        sr = GetComponent<SpriteRenderer>();
+    }
 
     public void SetWeapon(WeaponInfo newWeapon, WeaponRarity newRarity, float durability)
     {
         currentWeapon = newWeapon;
-        currentRarity = newRarity; 
-        currentDurability = durability;
-        
+        currentRarity = newRarity;
+
+        // คุมค่าความทนทานไม่ให้เกิน Max
+        currentDurability = Mathf.Clamp(durability, 0, MaxDurability);
+
         UpdateWeaponVisual();
     }
 
-    // ฟังก์ชันสำหรับลดความทนทานตอนโจมตี
+    // ฟังก์ชันลดความทนทาน (เรียกใช้จาก Boss หรือ Enemy เวลาโดนตี)
     public void DecreaseDurability(float amount)
     {
         if (currentWeapon == null) return;
-    
+
         currentDurability -= amount;
-        
+
         if (currentDurability <= 0)
         {
             currentDurability = 0;
-            BreakWeapon(); // 👈 เรียกฟังก์ชันพังอาวุธ
+            BreakWeapon();
         }
     }
-    
+
     void BreakWeapon()
     {
-        Debug.Log($"{currentWeapon.weaponName} พังแล้ว!");
+        if (currentWeapon == null) return;
 
+        Debug.Log($"<color=orange>[System]</color> <color=red>{currentWeapon.weaponName} พังยับเยิน!</color>");
+
+        // เคลียร์ข้อมูลอาวุธ
         currentWeapon = null;
         currentRarity = null;
 
-        // สั่งให้มือหยุดเหวี่ยง (ไปดึง Script Player มา Reset)
-        // ถ้าสคริปต์นี้อยู่ที่เดียวกับ Player ใช้ GetComponent ได้เลย
-        Player player = GetComponentInParent<Player>(); 
-        if(player != null) {
-            player.ResetAttack(); 
+        // สั่ง Reset สถานะผู้เล่น
+        Player player = GetComponentInParent<Player>();
+        if (player != null)
+        {
+            player.ResetAttack();
         }
 
         UpdateWeaponVisual();
     }
-    void UpdateWeaponVisual()
+
+    public void UpdateWeaponVisual()
     {
         if (sr == null) sr = GetComponent<SpriteRenderer>();
 
-        if (currentWeapon == null) 
+        if (currentWeapon == null)
         {
-            sr.sprite = null; 
+            sr.sprite = null;
+            // ล้างสี (ถ้ามีการใส่สีตาม Rarity ไว้ก่อนหน้า)
+            sr.color = Color.white;
             return;
         }
 
         sr.sprite = currentWeapon.itemModel;
+
+        // --- อัปเกรด: ใส่สีตาม Rarity (ถ้ามีข้อมูลสีใน SO) ---
+        /*
+        if (currentRarity != null) {
+            sr.color = currentRarity.rarityColor;
+        }
+        */
     }
-    
 }

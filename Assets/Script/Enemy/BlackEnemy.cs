@@ -1,106 +1,132 @@
-using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using System.Collections;
 
 public class BlackEnemy : MonoBehaviour
 {
+    [Header("References")]
     public EnemyInfo enemyInfo;
     public Transform weaponHandler;
-    private SpriteRenderer sr;
-    public bool playerDetect;
     public DetectionArea DetectionArea;
-    public bool isGettingHit;
-    public bool hitArea;
-    public float health;
-    public float maxHealth;
-    public float attackDamage;
     public AttackArea AttackArea;
     public GameObject Sense;
     public GameObject Hand;
+
+    [Header("Settings")]
     public float handSpeed;
     public float waitTimer = 1.0f;
-    public float Timer;
-    public float attackTimer;
-    public float expGiven;
-    private Player player;
-    private Rigidbody2D rb;
     public float knockbackForce = 2000f;
     public float offsetY = 1f;
-    public WeaponHandler weaponHandlerScript;
-    
-    
-    // 1. เพิ่มตัวแปรเพื่อเก็บข้อมูลตำแหน่งของ Player
-    public Transform playerTransform; 
+
+    // Internal Variables
+    private SpriteRenderer sr;
+    private Rigidbody2D rb;
+    private Player player;
+    private Transform playerTransform;
+    private WeaponHandler weaponHandlerScript;
+
+    [Header("Status (Read Only)")]
+    public float health;
+    public float maxHealth;
+    public float attackDamage;
+    public float expGiven;
+    public float Timer;
+    public float attackTimer;
+    public bool playerDetect;
+    public bool isGettingHit;
+    public bool hitArea;
 
     void Start()
     {
-        weaponHandlerScript = weaponHandler.GetComponent<WeaponHandler>();
-        AttackArea.transform.localScale = new Vector3(enemyInfo.attackReach , enemyInfo.attackReach , enemyInfo.attackReach);
-        UpdateWeaponVisual();
-        health = enemyInfo.health;
-        attackDamage = enemyInfo.attackDamage;
-        expGiven = enemyInfo.expGiven;
-        if (InGameScript.currentStage > 0)
+        // 1. Initial References
+        rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
+        if (weaponHandler != null) weaponHandlerScript = weaponHandler.GetComponent<WeaponHandler>();
+
+        // 2. Setup Stats จาก enemyInfo และ Scaling ตามด่าน
+        if (enemyInfo != null)
         {
-            health = enemyInfo.health * Mathf.Pow(1.025f, InGameScript.currentStage - 1);
-            attackDamage += 0.5f * (InGameScript.currentStage - 1);
-            expGiven = enemyInfo.expGiven * Mathf.Pow(1.05f, InGameScript.currentStage - 1);
+            health = enemyInfo.health;
+            attackDamage = enemyInfo.attackDamage;
+            expGiven = enemyInfo.expGiven;
+
+            if (InGameScript.currentStage > 0)
+            {
+                health *= Mathf.Pow(1.025f, InGameScript.currentStage - 1);
+                attackDamage += 0.5f * (InGameScript.currentStage - 1);
+                expGiven *= Mathf.Pow(1.05f, InGameScript.currentStage - 1);
+            }
+
+            maxHealth = health;
+            attackTimer = enemyInfo.attackSpeed;
+
+            // ปรับระยะ AttackArea ตามข้อมูลอาวุธ
+            if (AttackArea != null)
+                AttackArea.transform.localScale = Vector3.one * enemyInfo.attackReach;
+
+            // ตั้งตำแหน่ง Sense (เครื่องหมายตกใจ)
+            if (Sense != null)
+                Sense.transform.localPosition = new Vector3(Sense.transform.localPosition.x, Sense.transform.localPosition.y + enemyInfo.senseLocate, Sense.transform.localPosition.z);
         }
+
         maxHealth = health;
         Timer = waitTimer;
-        Sense.transform.localPosition = new Vector3(Sense.transform.localPosition.x, Sense.transform.localPosition.y + enemyInfo.senseLocate, Sense.transform.localPosition.z);
-        
-        attackTimer = enemyInfo.attackSpeed;
 
+        // 3. หา Player แค่ครั้งเดียวตอนเริ่ม (ถ้าหาไม่เจอค่อยหาใหม่ใน Update แบบปลอดภัย)
+        FindPlayer();
+        UpdateWeaponVisual();
+    }
+
+    void FindPlayer()
+    {
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
         {
             player = playerObj.GetComponent<Player>();
             playerTransform = playerObj.transform;
         }
-
-        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
-    {   
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
+    {
+        // ถ้าไม่มี Player ใน Reference ให้พยายามหาใหม่ (เผื่อ Spawn มาทีหลัง)
+        if (playerTransform == null)
         {
-            player = playerObj.GetComponent<Player>();
-            playerTransform = playerObj.transform;
+            FindPlayer();
+            return;
         }
-        if (player.attackTimer <= 0)
-        {
-            isGettingHit = false;
-        }
+
+        // Logic ป้องกันการโดนตีซ้ำซ้อน
+        if (player.attackTimer <= 0) isGettingHit = false;
+
         HealthUpdate();
-        if (attackTimer > 0)
-        {
-            attackTimer -= Time.deltaTime;
-        }
+
+        // Cooldown การโจมตี
+        if (attackTimer > 0) attackTimer -= Time.deltaTime;
+
+        // ดึงสถานะจาก Sensor Areas
         playerDetect = DetectionArea.playerDetect;
         hitArea = AttackArea.hitArea;
-        if (playerDetect && playerTransform != null)
+
+        // AI Logic
+        if (playerDetect)
         {
-            if (Timer > 0) 
+            if (Timer > 0)
             {
                 Timer -= Time.deltaTime;
-                Sense.GetComponent<SpriteRenderer>().enabled = true;
+                if (Sense != null) Sense.GetComponent<SpriteRenderer>().enabled = true;
             }
-            if (Timer <= 0) 
+            else
             {
                 Attack();
-                MoveAwayFromPlayer();
-                Sense.GetComponent<SpriteRenderer>().enabled = false;
+                MoveAwayFromPlayer(); // เดินหนี (Kiting)
+                if (Sense != null) Sense.GetComponent<SpriteRenderer>().enabled = false;
             }
         }
-        if (DetectionArea.GetComponent<DetectionArea>().handDetect)
-        {   
-            if (Timer <= 0)
-            {
-                MoveTowardsPlayer();
-            }
+
+        // Logic การส่งมือไปตบ
+        if (DetectionArea.handDetect && Timer <= 0)
+        {
+            MoveTowardsPlayer();
         }
     }
 
@@ -108,85 +134,57 @@ public class BlackEnemy : MonoBehaviour
     {
         if (hitArea && attackTimer <= 0)
         {
-            Debug.Log("Hit Player");
             attackTimer = enemyInfo.attackSpeed;
-            player.health -= enemyInfo.attackDamage;
-
+            player.health -= attackDamage;
             player.ApplyKnockback(transform.position, 2f, 0.1f);
+            Debug.Log("<color=orange>BlackEnemy:</color> ตบผู้เล่นสำเร็จ!");
         }
     }
+
     void HealthUpdate()
-    {   
+    {
         if (health <= 0)
         {
-            Debug.Log("dead");
-            this.gameObject.SetActive(false);
-            player.currentEXP += enemyInfo.expGiven;
+            player.currentEXP += expGiven;
+            gameObject.SetActive(false);
         }
     }
 
     void MoveTowardsPlayer()
     {
-        // 1. สร้างตำแหน่งเป้าหมายใหม่ (เอาตำแหน่ง Player มาบวกค่าความสูงที่เราต้องการ)
-        Vector2 targetPosition = new Vector2(
-            playerTransform.position.x, 
-            playerTransform.position.y + offsetY
-        );
+        if (Hand == null) return;
 
-        // 2. สั่งให้มือวิ่งไปที่ targetPosition แทนที่จะเป็นตัว Player ตรงๆ
-        Hand.transform.position = Vector2.MoveTowards(
-            Hand.transform.position, 
-            targetPosition, 
-            handSpeed * Time.deltaTime
-        );
+        // ส่งมือไปที่ตำแหน่ง Player + OffsetY
+        Vector2 targetPosition = new Vector2(playerTransform.position.x, playerTransform.position.y + offsetY);
+        Hand.transform.position = Vector2.MoveTowards(Hand.transform.position, targetPosition, handSpeed * Time.deltaTime);
 
-        // เช็กทิศทางเพื่อ Flip (ใช้ตำแหน่งเป้าหมายมาเช็ก)
-        if (targetPosition.x < transform.position.x)
-            sr.flipX = false;
-        else
-            sr.flipX = true;
+        // หันหน้าศัตรูตามเป้าหมายของมือ
+        if (sr != null) sr.flipX = (targetPosition.x >= transform.position.x);
     }
+
     void MoveAwayFromPlayer()
     {
-        // 1. หาความต่างของตำแหน่งเพื่อหาทิศทางที่จะ "หนี"
-        // (ตำแหน่งของศัตรูเอง - ตำแหน่งของ Player) = ทิศทางที่พุ่งออกจาก Player
+        // คำนวณทิศทางหนี (ถอยหลังจาก Player)
         Vector2 directionAway = (transform.position - playerTransform.position).normalized;
-
-        // 2. กำหนดจุดเป้าหมายสมมติที่อยู่ห่างออกไปในทิศทางนั้น
         Vector2 targetPos = (Vector2)transform.position + directionAway;
 
-        // 3. ใช้ MoveTowards เพื่อเคลื่อนที่ไปยังจุดที่ห่างออกไป
-        transform.position = Vector2.MoveTowards(
-            transform.position, 
-            targetPos, 
-            enemyInfo.speed * Time.deltaTime
-        );
+        transform.position = Vector2.MoveTowards(transform.position, targetPos, enemyInfo.speed * Time.deltaTime);
 
-        // ส่วนการหันหน้า (Flip) ให้จ้อง Player ไว้ตลอด (ถอยหลังแบบ Moonwalk)
-        if (playerTransform.position.x < transform.position.x)
-            sr.flipX = false;
-        else
-            sr.flipX = true;
+        // หันหน้าจ้อง Player ตลอดเวลา (Moonwalk)
+        if (sr != null) sr.flipX = (playerTransform.position.x >= transform.position.x);
     }
+
     void UpdateWeaponVisual()
     {
         if (sr == null) sr = GetComponent<SpriteRenderer>();
-
-        if (enemyInfo == null) 
-        {
-            sr.sprite = null; 
-            return;
-        }
-
-        sr.sprite = enemyInfo.enemyModel;
+        if (enemyInfo != null && sr != null) sr.sprite = enemyInfo.enemyModel;
     }
 
-    void ApplyKnockback(Vector3 attackerPos)
+    public void ApplyKnockback(Vector3 attackerPos)
     {
+        StopCoroutine("KnockbackLerp"); // หยุดตัวเก่าก่อนถ้ามี
         Vector2 direction = (transform.position - attackerPos).normalized;
-        // กำหนดเลยว่าอยากให้ถอยไปกี่เมตร (เช่น 2 เมตร)
-        Vector2 targetPos = (Vector2)transform.position + (direction * 2f); 
-
+        Vector2 targetPos = (Vector2)transform.position + (direction * 2f);
         StartCoroutine(KnockbackLerp(targetPos, 0.1f));
     }
 
@@ -194,36 +192,30 @@ public class BlackEnemy : MonoBehaviour
     {
         float time = 0;
         Vector2 startPos = transform.position;
-
         while (time < duration)
         {
-            // สั่งให้เลื่อนตำแหน่งไปหาเป้าหมายตามเวลาที่ผ่านไป
             transform.position = Vector2.Lerp(startPos, target, time / duration);
             time += Time.deltaTime;
             yield return null;
         }
-        transform.position = target; // มั่นใจว่าหยุดตรงจุดเป้าหมายเป๊ะ
+        transform.position = target;
     }
-    private void OnTriggerEnter2D(Collider2D collision) 
+
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("PlayerAttackHitBox"))
         {
-            // ใช้ตัวแปรนี้เพื่อเช็กว่า "ของฝั่งเรา" ที่โดนชนคืออันไหน
-            // เราจะดึง Collider ของตัวแม่ (BaseEnemy) มาเทียบ
             Collider2D myMainCollider = GetComponent<Collider2D>();
-
-            // เช็กว่าอาวุธของผู้เล่น กำลังแตะอยู่กับ Collider หลักของตัวแม่หรือไม่
-            if (collision.IsTouching(myMainCollider))
+            if (collision.IsTouching(myMainCollider) && !isGettingHit)
             {
-                if (!isGettingHit)
-                {
-                    Debug.Log("<color=Red>โดนตัวเน้นๆ!</color>");
-                    health -= player.attackDamage + (player.attackDamage * (player.bonusAttackDamage/100));
-                    Debug.Log("เสียเลือดไป : " + (player.attackDamage + (player.attackDamage * (player.bonusAttackDamage/100))));
-                    isGettingHit = true;
-                    ApplyKnockback(collision.transform.position);
-                    weaponHandlerScript.DecreaseDurability(enemyInfo.durabilityCost);
-                }
+                float totalDamage = player.attackDamage + (player.attackDamage * (player.bonusAttackDamage / 100));
+                health -= totalDamage;
+                isGettingHit = true;
+
+                ApplyKnockback(collision.transform.position);
+                if (weaponHandlerScript != null) weaponHandlerScript.DecreaseDurability(enemyInfo.durabilityCost);
+
+                Debug.Log($"<color=red>BlackEnemy:</color> โดนตบไป {totalDamage}");
             }
         }
     }

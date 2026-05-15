@@ -3,23 +3,42 @@ using System.Collections;
 
 public class Player : MonoBehaviour
 {
+    // --- ระบบ Singleton ---
+    public static Player instance;
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            // ถ้ามีตัวเก่าอยู่แล้ว ทำลายตัวใหม่ทิ้งทันที
+            Destroy(gameObject);
+            return;
+        }
+    }
+
+    [Header("Core References")]
     public Transform handTransform;
     public Transform weaponHandler;
     public Transform HitBox;
     public SpriteRenderer[] characterParts;
     public Rigidbody2D rb;
-    public Vector2 moveInput;
     public Animator animator;
     public WeaponHandler weaponHandlerScript;
-    public ItemPickup weaponNew;
+    public GameObject selectionUI; // ตัวนี้จะถูกอัปเดตอัตโนมัติถ้าหลุด
+
+    [Header("Movement Settings")]
     public float speed = 5f;
-    private Camera mainCam; 
+    public Vector2 moveInput;
+    private Camera mainCam;
     private SpriteRenderer handSR;
     private SpriteRenderer weaponSR;
-    public GameObject selectionUI;
-    public bool isHand;
 
-    [Header("PlayerStat")]
+    [Header("Player Stats")]
     public int level = 1;
     public float maxHealth = 100;
     public float health = 100;
@@ -29,58 +48,61 @@ public class Player : MonoBehaviour
     public float attackTimer;
     public float maxEXP = 20;
     public float currentEXP;
-    private float remainingEXP;
 
-    private float baseAngle;
-    private bool isMouseOnLeft;
-    private float mousePos;
-    private bool weaponInRange = false;
-    public bool isSelecting;
-    public float knockbackForce = 2000f;
-
-    [Header("PlayerBoost")]
+    [Header("Player Boosts")]
     public float bonusHealth;
     public float bonusAttackDamage;
     public float bonusAttackSpeed;
-    
-    
+
+    [Header("State Flags")]
+    public bool isHand;
+    public bool isSelecting;
+    public bool weaponInRange = false;
+    public ItemPickup weaponNew;
+    public bool isDead = false;
+
+    private float baseAngle;
+    private bool isMouseOnLeft;
+
     void Start()
     {
-        mainCam = Camera.main; 
-        if (characterParts.Length > 4)
-        {
-            handSR = characterParts[4];
-        }
+        RefreshReferences(); // เรียกใช้การหา Reference เริ่มต้น
 
+        if (characterParts.Length > 4) handSR = characterParts[4];
         weaponSR = weaponHandler.GetComponent<SpriteRenderer>();
         weaponHandlerScript = weaponHandler.GetComponent<WeaponHandler>();
-        health = maxHealth;
+
+        health = maxHealth + bonusHealth;
     }
 
     void Update()
     {
-        if (attackTime < 0.1f)
+        if (isDead) return;
+
+        // --- ส่วนที่แก้ไข: "ฉลาดข้ามฉาก" เช็ก Reference ที่อาจพังเมื่อเปลี่ยน Scene ---
+        if (mainCam == null) mainCam = Camera.main;
+
+        if (selectionUI == null || !selectionUI.activeInHierarchy)
         {
-            attackTime = 0.1f;
+            // พยายามหา UI ใหม่ในฉาก (ตรวจสอบว่า Canvas ในฉากใหม่มีชื่อ InGameUI หรือไม่)
+            GameObject foundUI = GameObject.Find("InGameUI");
+            if (foundUI != null) selectionUI = foundUI;
         }
+
+        attackTime = Mathf.Max(0.1f, attackTime);
+
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
         moveInput = moveInput.normalized;
 
+        if (weaponHandlerScript != null && weaponHandlerScript.currentWeapon != null)
+        {
+            totalDamage = attackDamage * (1 + (bonusAttackDamage / 100));
+        }
+
         HandleFlipAndMovementLogic();
-        totalDamage = attackDamage + (attackDamage * (bonusAttackDamage/100));
-
-        if (health > maxHealth)
-        {
-            health = maxHealth;
-        }
-
+        HandleStatsAndExperience();
         Attack();
-        //LevelUp();
-        if (currentEXP >= maxEXP && !isSelecting)
-        {
-            StartCoroutine(LevelUpRoutine());
-        }
 
         if (weaponInRange && Input.GetKeyDown(KeyCode.E))
         {
@@ -88,72 +110,126 @@ public class Player : MonoBehaviour
         }
     }
 
-    void LevelUp()
+    // ฟังก์ชันช่วยหา Reference ใหม่เวลาเปลี่ยนด่าน
+    void RefreshReferences()
     {
-        if (currentEXP >= maxEXP)
+        mainCam = Camera.main;
+        if (selectionUI == null) selectionUI = GameObject.Find("InGameUI");
+    }
+
+    void HandleStatsAndExperience()
+    {
+        float currentMax = maxHealth + bonusHealth;
+        if (health > currentMax) health = currentMax;
+
+        if (health <= 0 && !isDead)
+        {
+            health = 0;
+            Die();
+        }
+
+        if (currentEXP >= maxEXP && !isSelecting)
+        {
+            StartCoroutine(LevelUpRoutine());
+        }
+    }
+
+    void Die()
+    {
+        isDead = true;
+        Debug.Log("<color=red>Player HAS DIED!</color>");
+    }
+
+    IEnumerator LevelUpRoutine()
+    {
+        isSelecting = true;
+        while (currentEXP >= maxEXP)
         {
             currentEXP -= maxEXP;
             level += 1;
             maxEXP *= 1.25f;
 
-            Time.timeScale = 0f;
-            selectionUI.SetActive(true);
-            selectionUI.GetComponent<CardSelect>().ShowCard();
-        }
-    }
-    IEnumerator LevelUpRoutine()
-    {
-        isSelecting = true;
+            // ตรวจสอบ selectionUI อีกครั้งกันพลาด
+            if (selectionUI == null) selectionUI = GameObject.Find("InGameUI");
 
-        while (currentEXP >= maxEXP)
-        {
-            currentEXP -= maxEXP;
-            level += 1;
-            maxEXP *= 1.25f; 
-
-            Transform cardDisplay = selectionUI.transform.Find("Card Display");
-            Time.timeScale = 0f; 
-
-            cardDisplay.gameObject.SetActive(true);
-
-            CardSelect cardScript = selectionUI.GetComponent<CardSelect>();
-            if (cardScript != null)
+            if (selectionUI != null)
             {
-                cardScript.ShowCard();
+                Transform cardDisplay = selectionUI.transform.Find("Card Display");
+                if (cardDisplay != null)
+                {
+                    Time.timeScale = 0f;
+                    cardDisplay.gameObject.SetActive(true);
+
+                    CardSelect cardScript = selectionUI.GetComponent<CardSelect>();
+                    if (cardScript != null) cardScript.ShowCard();
+
+                    yield return new WaitUntil(() => isSelecting == false);
+                    cardDisplay.gameObject.SetActive(false);
+                }
             }
 
-            yield return new WaitUntil(() => isSelecting == false);
-
-            cardDisplay.gameObject.SetActive(false);
-
-            if (currentEXP >= maxEXP) 
+            if (currentEXP >= maxEXP)
             {
-                isSelecting = true; 
-
+                isSelecting = true;
                 yield return new WaitForSecondsRealtime(0.1f);
             }
         }
-
         isSelecting = false;
         Time.timeScale = 1f;
+    }
 
-        Debug.Log("เลเวลอัปเสร็จสิ้น! เลเวลปัจจุบัน: " + level);
-    }
-    public void ApplyKnockback(Vector3 attackerPos, float force, float duration) 
+    public void Attack()
     {
-        // คำนวณทิศทาง (จากคนตี -> มาที่ตัว Player)
-        Vector2 direction = (transform.position - attackerPos).normalized;
-        Vector2 targetPos = (Vector2)transform.position + (direction * force);
-        
-        // สั่งให้เริ่มการขยับแบบ Lerp (เจมส์ต้องมี Coroutine นี้ด้วยนะ)
-        StartCoroutine(PlayerKnockbackLerp(targetPos, duration));
+        if (weaponHandlerScript == null || weaponHandlerScript.currentWeapon == null)
+        {
+            ResetAttack();
+            return;
+        }
+
+        if (weaponHandlerScript.currentWeapon.weaponType == WeaponInfo.WeaponType.Melee)
+        {
+            if (Input.GetMouseButtonDown(0) && attackTimer <= 0)
+            {
+                HitBox.gameObject.SetActive(true);
+                attackTimer = attackTime;
+                baseAngle = GetMouseAngle();
+                weaponHandlerScript.DecreaseDurability(1f);
+            }
+
+            if (attackTimer > 0)
+            {
+                attackTimer -= Time.deltaTime;
+                float progress = attackTimer / attackTime;
+                float startOffset = isMouseOnLeft ? (-45f - 180f) : 45f;
+                float endOffset = isMouseOnLeft ? (90f - 180f) : -90f;
+                float currentOffset = Mathf.Lerp(endOffset, startOffset, progress);
+                handTransform.localRotation = Quaternion.Euler(0, 0, baseAngle + currentOffset);
+            }
+            else
+            {
+                HitBox.gameObject.SetActive(false);
+            }
+        }
     }
-    
+
+    public void ResetAttack()
+    {
+        attackTimer = 0;
+        if (HitBox != null) HitBox.gameObject.SetActive(false);
+        handTransform.localRotation = Quaternion.identity;
+    }
+
+    public void ApplyKnockback(Vector3 attackerPos, float force, float duration)
+    {
+        if (isDead) return;
+        Vector2 direction = (transform.position - attackerPos).normalized;
+        StartCoroutine(PlayerKnockbackLerp((Vector2)transform.position + (direction * force), duration));
+    }
+
     IEnumerator PlayerKnockbackLerp(Vector2 target, float duration)
     {
         float time = 0;
         Vector2 startPos = transform.position;
-    
         while (time < duration)
         {
             transform.position = Vector2.Lerp(startPos, target, time / duration);
@@ -162,234 +238,105 @@ public class Player : MonoBehaviour
         }
         transform.position = target;
     }
+
     float GetMouseAngle()
     {
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-    
-        // 2. หาทางต่างระหว่าง ตำแหน่งเมาส์ กับ ตำแหน่งแขน (Pivot)
-        // เราใช้ z = 0 เพื่อให้การคำนวณใน 2D แม่นยำที่สุด
+        if (mainCam == null) return 0f;
+        Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
         Vector3 direction = mousePos - handTransform.position;
-        direction.z = 0;
-        // 3. ใช้ Atan2 เพื่อหาองศา (มันจะคืนค่าเป็น Radian เลยต้องคูณ Rad2Deg เพื่อเปลี่ยนเป็นองศา 0-360)
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        return angle;
-
+        return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
     }
+
     void Pickup()
     {
         if (weaponNew == null) return;
-
-        
-        // 1. ดึงค่าจาก "พื้น" มาเตรียมไว้
         WeaponInfo groundData = weaponNew.weaponData;
         WeaponRarity groundRarity = weaponNew.weaponRarity;
-        float groundDurability = weaponNew.currentDurability; // ค่าที่พื้นจำไว้
-
-        // 2. จำค่าจาก "มือ" ปัจจุบัน
+        float groundDurability = weaponNew.currentDurability;
         WeaponInfo handData = weaponHandlerScript.currentWeapon;
         WeaponRarity handRarity = weaponHandlerScript.currentRarity;
         float handDurability = weaponHandlerScript.currentDurability;
 
-        // 3. เอาของจากพื้นขึ้นมือ (พร้อมค่าความทนทานของมัน)
         weaponHandlerScript.SetWeapon(groundData, groundRarity, groundDurability);
-        attackTime = weaponHandlerScript.currentWeapon.attackSpeed - (weaponHandlerScript.currentWeapon.attackSpeed * bonusAttackSpeed/100);
-        attackDamage = weaponHandlerScript.currentWeapon.baseDamage + weaponHandlerScript.currentRarity.rarityDamage;;
+        attackTime = groundData.attackSpeed * (1 - (bonusAttackSpeed / 100));
+        attackDamage = groundData.baseDamage + groundRarity.rarityDamage;
+        HitBox.localScale = new Vector3(0.5f, groundData.attackReach / 1.2f, 0.5f);
 
-        Debug.Log(weaponHandlerScript.currentWeapon.attackReach);
-        HitBox.localScale = new Vector3(0.5f , weaponHandlerScript.currentWeapon.attackReach/1.2f , 0.5f);
-        if (handData != null)
-        {
-            // 4. เอาของจากมือลงพื้น (พร้อมค่าความทนทานที่ใช้ไปแล้ว)
-            weaponNew.SetWeapon(handData, handRarity, handDurability);
-        }
-        else
-        {
-            Destroy(weaponNew.gameObject);
-        }
+        if (handData != null) weaponNew.SetWeapon(handData, handRarity, handDurability);
+        else Destroy(weaponNew.gameObject);
     }
-    void Attack()
-    {   
-        if (weaponHandlerScript.currentWeapon != null && weaponHandlerScript.currentRarity != null)
-        {
-            if (weaponHandlerScript.currentWeapon.weaponType == WeaponInfo.WeaponType.Melee)
-            {
-                if (Input.GetMouseButtonDown(0))
-                {   
-                    if (attackTimer <= 0)
-                    {
-                        HitBox.gameObject.SetActive(true);
-                        attackTimer = attackTime;
-                        baseAngle = GetMouseAngle();
 
-                        string wName = weaponHandlerScript.currentWeapon.weaponName;
-                        float finalDmg = weaponHandlerScript.currentWeapon.baseDamage + weaponHandlerScript.currentRarity.rarityDamage;
-                        string rName = weaponHandlerScript.currentRarity.rarityName; // สมมติว่ามีชื่อใน SO
-
-                        // 2. ลดความทนทาน (ถ้าพัง currentWeapon จะกลายเป็น null ในบรรทัดนี้)
-                        Debug.Log($"ตีด้วย {wName} | ความแรงรวม: {finalDmg} | ระดับ: {rName} | ความเร็วโจมตี: {weaponHandlerScript.currentWeapon.attackSpeed} |ความคงทนเหลือ: {weaponHandlerScript.currentDurability}");
-                        
-
-                        // 4. เช็กเสริมเผื่ออยากรู้ว่าพังหรือยัง
-                        if (weaponHandlerScript.currentWeapon == null)
-                        {
-                            Debug.Log("--- อาวุธพังคามือเรียบร้อย! ---");
-                        }
-                    }
-                } 
-                if (attackTimer > 0)
-                {
-                    attackTimer -= Time.deltaTime;
-                }
-                 // ฟังก์ชันที่เจมส์ใช้คำนวณองศาเมาส์
-
-                if (isMouseOnLeft)
-                {
-                    if (attackTimer > 0)
-                    {   
-                        float progress = attackTimer / attackTime;
-                        float startOffset = -45f - 180f;
-                        float endOffset = 90f - 180f;
-                        float currentOffset = Mathf.Lerp(endOffset, startOffset, progress);
-                        handTransform.localRotation = Quaternion.Euler(0, 0, baseAngle + currentOffset);
-                    }
-                }
-                else if (!isMouseOnLeft)
-                {
-                    if (attackTimer > 0)
-                    {   
-                        float progress = attackTimer / attackTime;
-                        float startOffset = 45f;
-                        float endOffset = -90f;
-                        float currentOffset = Mathf.Lerp(endOffset, startOffset, progress);
-                        handTransform.localRotation = Quaternion.Euler(0, 0, baseAngle + currentOffset);
-                    }
-                }
-            }
-            else if (weaponHandlerScript.currentWeapon.weaponType == WeaponInfo.WeaponType.Range)
-            {
-
-            }
-        }
-    }
-    public void ResetAttack()
-    {
-        attackTimer = 0; // หยุดการนับเวลาโจมตี
-        HitBox.gameObject.SetActive(false); // ปิด Hitbox ทันที
-        // คืนค่าตำแหน่งหมุนของมือให้เป็นปกติ (0 องศา หรือตำแหน่งเริ่มต้น)
-        handTransform.localRotation = Quaternion.identity; 
-    }
     void HandleFlipAndMovementLogic()
     {
+        if (mainCam == null) return;
+
         Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
-        Vector3 direction = mousePos - handTransform.position;
-        
-        
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        float angle = GetMouseAngle();
+        isMouseOnLeft = mousePos.x < transform.position.x;
 
         if (attackTimer <= 0)
-        {   
-            HitBox.gameObject.SetActive(false);
-            isMouseOnLeft = mousePos.x < transform.position.x;
+        {
             if (isMouseOnLeft)
             {
                 handTransform.rotation = Quaternion.Euler(0, 0, angle + 180f);
                 if (handSR != null) handSR.sortingOrder = 3;
                 if (weaponSR != null) weaponSR.sortingOrder = 2;
-                if (weaponHandler.localPosition.x > 0)
-                {
-                    weaponHandler.localPosition = new Vector3(-weaponHandler.localPosition.x, weaponHandler.localPosition.y, weaponHandler.localPosition.z);
-                    HitBox.localPosition = new Vector3(-HitBox.localPosition.x, HitBox.localPosition.y, HitBox.localPosition.z);
-                }
-            }   
+                FixWeaponSide(-1);
+            }
             else
             {
                 handTransform.rotation = Quaternion.Euler(0, 0, angle);
                 if (handSR != null) handSR.sortingOrder = -2;
                 if (weaponSR != null) weaponSR.sortingOrder = -1;
-                if (weaponHandler.localPosition.x < 0)
-                {
-                    weaponHandler.localPosition = new Vector3(-weaponHandler.localPosition.x, weaponHandler.localPosition.y, weaponHandler.localPosition.z);
-                    HitBox.localPosition = new Vector3(-HitBox.localPosition.x, HitBox.localPosition.y, HitBox.localPosition.z);
-                }
+                FixWeaponSide(1);
             }
 
             foreach (SpriteRenderer part in characterParts)
             {
-                if (part != null)
-                {
-                    part.flipX = isMouseOnLeft;
-                }
+                if (part != null) part.flipX = isMouseOnLeft;
             }
         }
 
-        
-
         float currentSpeed = speed;
-        bool isBackstepping = false;        
-
+        bool isBackstepping = false;
         if (moveInput.x != 0)
         {
-            if (isMouseOnLeft)
-            {
-                if (moveInput.x > 0)
-                {
-                    isBackstepping = false;
-                    currentSpeed = speed * 0.5f;
-                }
-                else if (moveInput.x < 0)
-                {
-                    isBackstepping = true;
-                    currentSpeed = speed;
-                }
-            }
-            else if (!isMouseOnLeft)
-            {   
-                if (moveInput.x > 0)
-                {
-                    isBackstepping = false;
-                    currentSpeed = speed;
-                }
-                else if (moveInput.x < 0)
-                {
-                    isBackstepping = true;
-                    currentSpeed = speed * 0.5f;
-                }
-            }
+            bool movingOpposite = (isMouseOnLeft && moveInput.x > 0) || (!isMouseOnLeft && moveInput.x < 0);
+            isBackstepping = movingOpposite;
+            currentSpeed = movingOpposite ? speed * 0.5f : speed;
         }
 
         animator.SetBool("isMove", moveInput != Vector2.zero);
         animator.SetBool("isBackstep", isBackstepping);
-
-        
         rb.linearVelocity = moveInput * currentSpeed;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision) 
+    void FixWeaponSide(int side)
     {
-        if (collision.gameObject.CompareTag("Weapon"))
+        if ((side == -1 && weaponHandler.localPosition.x > 0) || (side == 1 && weaponHandler.localPosition.x < 0))
         {
-            ItemPickup item = collision.gameObject.GetComponent<ItemPickup>();
+            weaponHandler.localPosition = new Vector3(-weaponHandler.localPosition.x, weaponHandler.localPosition.y, weaponHandler.localPosition.z);
+            HitBox.localPosition = new Vector3(-HitBox.localPosition.x, HitBox.localPosition.y, HitBox.localPosition.z);
+        }
+    }
 
-            if (item != null && item.weaponData != null)
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Weapon"))
+        {
+            ItemPickup item = collision.GetComponent<ItemPickup>();
+            if (item != null)
             {
-                Debug.Log("เจอไอเทม: " + item.weaponData.weaponName + 
-          "\nระดับความหายาก: " + item.weaponRarity.rarityName + 
-          "\nดาเมจรวม: " + item.FinalDamage + 
-          "\nความเร็วรวม: " + item.weaponData.attackSpeed);
-
                 weaponInRange = true;
                 weaponNew = item;
             }
         }
-        if (collision.gameObject.CompareTag("Hand"))
-        {
-            isHand = true;
-        }
+        if (collision.CompareTag("Hand")) isHand = true;
     }
 
     void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Weapon"))
+        if (collision.CompareTag("Weapon"))
         {
             weaponInRange = false;
             weaponNew = null;

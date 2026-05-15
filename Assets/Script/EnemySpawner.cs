@@ -3,16 +3,17 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     public bool isBoss;
-    [Header("Settings")]
+
+    [Header("Enemy Pools")]
     public GameObject[] stageIToVEnemy;   // ด่าน 1-5
     public GameObject[] stageVIToXEnemy;  // ด่าน 6-10
     public GameObject[] stageXToEnemy;    // ด่าน 11 ขึ้นไป
-    public Transform[] spawnPoints;      // จุดที่อยากให้มอนสเตอร์ไปโผล่ (ถ้ามี)
-    
-    [Header("Boss")]
-    public GameObject VStageBoss;
-    public GameObject XStageBoss;
-    public GameObject LastStageBoss;
+    public Transform[] spawnPoints;
+
+    [Header("Boss Settings")]
+    public GameObject VStageBoss;     // บอสตัวที่ 1 (ด่าน 5, 15)
+    public GameObject XStageBoss;     // บอสตัวที่ 2 (ด่าน 10, 20)
+    public GameObject LastStageBoss;  // บอสใหญ่ (ด่าน 25)
     public Transform bossSpawnPoint;
 
     void Start()
@@ -25,64 +26,78 @@ public class EnemySpawner : MonoBehaviour
         int stage = InGameScript.currentStage;
         GameObject bossToSpawn = null;
 
-        // --- 1. เช็กเงื่อนไขด่านแบบเจาะจงเลข ---
-        if (stage == 5 || stage == 15) 
+        // 1. ตรวจสอบเงื่อนไขด่านบอส (Logic 5, 10, 15, 20, 25)
+        if (stage == 5 || stage == 15)
         {
             bossToSpawn = VStageBoss;
         }
-        else if (stage == 10 || stage == 20) 
+        else if (stage == 10 || stage == 20)
         {
             bossToSpawn = XStageBoss;
         }
-        else if (stage == 25) 
+        else if (stage == 25)
         {
             bossToSpawn = LastStageBoss;
         }
 
-        // --- 2. ถ้าเจอเลขด่านที่กำหนด ให้เสก Boss ออกมา ---
+        // 2. ถ้าเป็นด่านบอส
         if (bossToSpawn != null)
         {
-            if (bossSpawnPoint == null) 
-            {
-                Debug.LogError("ลืมลากจุดเกิดบอสใส่ช่องใน Inspector!");
-                return;
-            }
-
-            Vector3 bossPos = bossSpawnPoint.position; 
-            Debug.Log("<color=Yellow>พิกัดที่สั่งให้บอสเกิด: </color>" + bossPos); // เช็กเลขตรงนี้ใน Console
-
-            Instantiate(bossToSpawn, bossPos, Quaternion.identity);
+            SpawnBoss(bossToSpawn);
             isBoss = true;
-            return; 
+            return; // หยุดการทำงาน ไม่ต้องเสกลูกน้องปกติ
         }
 
-        // --- 3. เสกลูกน้องตามจำนวนปกติ (Code เดิม) ---
+        // 3. ถ้าเป็นด่านปกติ ให้เสกลูกน้อง
+        isBoss = false;
+        SpawnNormalEnemies();
+    }
+
+    void SpawnBoss(GameObject bossPrefab)
+    {
+        if (bossSpawnPoint == null)
+        {
+            Debug.LogError("[Spawner] ลืมใส่ Boss Spawn Point!");
+            return;
+        }
+
+        Instantiate(bossPrefab, bossSpawnPoint.position, Quaternion.identity);
+        Debug.Log($"<color=red>BOSS APPEARED!</color> Stage: {InGameScript.currentStage}");
+    }
+
+    void SpawnNormalEnemies()
+    {
         GameObject[] currentEnemyPool = GetCurrentEnemyPool();
-        if (currentEnemyPool == null || currentEnemyPool.Length == 0) return;
-        if (spawnPoints == null || spawnPoints.Length == 0) return;
+
+        // เช็กความพร้อมของข้อมูล
+        if (currentEnemyPool == null || currentEnemyPool.Length == 0 || spawnPoints.Length == 0)
+        {
+            Debug.LogWarning("[Spawner] ข้อมูล Pool หรือ SpawnPoints ไม่ครบ!");
+            return;
+        }
 
         for (int i = 0; i < InGameScript.enemyCount; i++)
         {
+            // สุ่มเลือกชนิดศัตรูและจุดเกิด
             GameObject prefabToSpawn = currentEnemyPool[Random.Range(0, currentEnemyPool.Length)];
-            int randomPointIndex = Random.Range(0, spawnPoints.Length);
-            Vector3 selectedSpawnPos = spawnPoints[randomPointIndex].position;
+            Transform selectedPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
 
-            float spawnRadius = 2.5f; 
-            Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
-            Vector3 finalPos = new Vector3(selectedSpawnPos.x + randomOffset.x, selectedSpawnPos.y + randomOffset.y, 0);
+            // ปรับระยะห่างในการเกิดรอบๆ จุด (Random Offset)
+            Vector2 randomCircle = Random.insideUnitCircle * 2.0f;
+            Vector3 finalPos = selectedPoint.position + new Vector3(randomCircle.x, randomCircle.y, 0);
 
             Instantiate(prefabToSpawn, finalPos, Quaternion.identity);
         }
+
+        Debug.Log($"<color=cyan>Enemies Spawned:</color> {InGameScript.enemyCount} units");
     }
-    // ฟังก์ชันช่วยเลือกกลุ่มศัตรูตามด่าน
+
     private GameObject[] GetCurrentEnemyPool()
     {
         int stage = InGameScript.currentStage;
 
-        if (stage >= 1 && stage <= 5) return stageIToVEnemy;
-        if (stage >= 6 && stage <= 10) return stageVIToXEnemy;
-        if (stage > 10) return stageXToEnemy;
-
-        return stageIToVEnemy; // default
+        if (stage <= 5) return stageIToVEnemy;
+        if (stage <= 10) return stageVIToXEnemy;
+        return stageXToEnemy;
     }
 }
