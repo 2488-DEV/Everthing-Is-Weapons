@@ -61,6 +61,11 @@ public class Player : MonoBehaviour
     public ItemPickup weaponNew;
     public bool isDead = false;
 
+    [Header("Debuff State")]
+    public float speedMultiplier = 1f;
+    private Coroutine webDebuffCoroutine;
+    private GameObject webVisualInstance;
+
     [Header("Audio")]
     public AudioClip swingSound;
     public AudioClip[] footstepSounds;
@@ -84,6 +89,7 @@ public class Player : MonoBehaviour
         weaponHandlerScript = weaponHandler.GetComponent<WeaponHandler>();
 
         health = maxHealth + bonusHealth;
+        speedMultiplier = 1f;
     }
 
     void Update()
@@ -409,6 +415,34 @@ public class Player : MonoBehaviour
         transform.position = target;
     }
 
+    public void ApplyWebDebuff(float multiplier, float duration, GameObject webVisualPrefab)
+    {
+        if (webDebuffCoroutine != null)
+            StopCoroutine(webDebuffCoroutine);
+
+        speedMultiplier = multiplier;
+
+        if (webVisualPrefab != null && webVisualInstance == null)
+        {
+            webVisualInstance = Instantiate(webVisualPrefab, transform);
+            webVisualInstance.transform.localPosition = Vector3.zero;
+        }
+
+        webDebuffCoroutine = StartCoroutine(WebDebuffTimer(duration));
+    }
+
+    IEnumerator WebDebuffTimer(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        speedMultiplier = 1f;
+        if (webVisualInstance != null)
+        {
+            Destroy(webVisualInstance);
+            webVisualInstance = null;
+        }
+        webDebuffCoroutine = null;
+    }
+
     float GetMouseAngle()
     {
         if (mainCam == null) return 0f;
@@ -481,7 +515,7 @@ public class Player : MonoBehaviour
 
         animator.SetBool("isMove", moveInput != Vector2.zero);
         animator.SetBool("isBackstep", isBackstepping);
-        rb.linearVelocity = moveInput * currentSpeed;
+        rb.linearVelocity = moveInput * currentSpeed * speedMultiplier;
     }
 
     void FixWeaponSide(int side)

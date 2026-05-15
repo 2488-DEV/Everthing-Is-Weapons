@@ -87,11 +87,10 @@ public class CardSelect : MonoBehaviour
         cardSlots[index].nameText.text = selectedSO.cardName;
         cardSlots[index].descText.text = selectedSO.cardDescription;
 
-        // ปรับให้โชว์ดาวแบบสะสม (1 ดาวเปิดดวงแรก, 3 ดาวเปิดหมด)
         int stars = selectedSO.starCount;
-        cardSlots[index].star1.SetActive(stars >= 1);
-        cardSlots[index].star2.SetActive(stars >= 2);
-        cardSlots[index].star3.SetActive(stars >= 3);
+        cardSlots[index].star1.SetActive(stars == 1);
+        cardSlots[index].star2.SetActive(stars == 2);
+        cardSlots[index].star3.SetActive(stars == 3);
     }
 
     private UpgradeCard GetRandomCardFromArray(UpgradeCard[] cardArray)

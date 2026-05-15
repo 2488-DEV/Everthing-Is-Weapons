@@ -15,6 +15,10 @@ public class SpiderEnemy : MonoBehaviour
     public float knockbackForce = 2000f;
     public float offsetY = 1f;
 
+    [Header("Web Shooting")]
+    public GameObject webPrefab;
+    public float webShootCooldown = 2f;
+
     // Internal Variables
     private SpriteRenderer sr;
     private Rigidbody2D rb;
@@ -115,11 +119,29 @@ public class SpiderEnemy : MonoBehaviour
             }
             else
             {
+                ShootWeb();
                 Attack();
                 MoveAwayFromPlayer(); // เดินหนี (Kiting)
                 if (Sense != null) Sense.GetComponent<SpriteRenderer>().enabled = false;
             }
         }
+    }
+
+    void ShootWeb()
+    {
+        if (webPrefab == null || attackTimer > 0) return;
+
+        Vector2 direction = (playerTransform.position - transform.position).normalized;
+        Vector2 spawnPos = (Vector2)transform.position + direction * 0.5f;
+
+        GameObject web = Instantiate(webPrefab, spawnPos, Quaternion.identity);
+        web.SetActive(true);
+
+        WebProjectile webScript = web.GetComponent<WebProjectile>();
+        if (webScript != null)
+            webScript.SetDirection(direction);
+
+        attackTimer = webShootCooldown;
     }
 
     void Attack()
