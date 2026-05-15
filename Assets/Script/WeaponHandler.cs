@@ -39,18 +39,19 @@ public class WeaponHandler : MonoBehaviour
     void BreakWeapon()
     {
         Debug.Log($"{currentWeapon.weaponName} พังแล้ว!");
-    
-        // 1. (Optional) เล่น Effect หรือเสียงอาวุธแตกตรงนี้
-        // AudioSource.PlayClipAtPoint(breakSound, transform.position);
-    
-        // 2. เคลียร์ค่าอาวุธในมือให้เป็น Null (กลายเป็นมือเปล่า)
+
         currentWeapon = null;
         currentRarity = null;
-    
-        // 3. อัปเดตภาพให้เป็นมือเปล่า
+
+        // สั่งให้มือหยุดเหวี่ยง (ไปดึง Script Player มา Reset)
+        // ถ้าสคริปต์นี้อยู่ที่เดียวกับ Player ใช้ GetComponent ได้เลย
+        Player player = GetComponentInParent<Player>(); 
+        if(player != null) {
+            player.ResetAttack(); 
+        }
+
         UpdateWeaponVisual();
     }
-
     void UpdateWeaponVisual()
     {
         if (sr == null) sr = GetComponent<SpriteRenderer>();

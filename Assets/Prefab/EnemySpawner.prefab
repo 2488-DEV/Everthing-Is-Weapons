@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7522132511375651820
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5343539304446721859}
+  - component: {fileID: 6029052020885032532}
+  m_Layer: 0
+  m_Name: EnemySpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5343539304446721859
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7522132511375651820}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.2116166, y: -0.68, z: -0.030603651}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6029052020885032532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7522132511375651820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cd4daa7cf86f2341bb386df8da2e419, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stageIToVEnemy:
+  - {fileID: 8365487459537967655, guid: 9980e22cd520baf47a213fa852e9363f, type: 3}
+  stageVIToXEnemy:
+  - {fileID: 8365487459537967655, guid: 9980e22cd520baf47a213fa852e9363f, type: 3}
+  - {fileID: 4759811672600158747, guid: 24508d11fef19bd4caa6c0d8a9a154c2, type: 3}
+  stageXToEnemy: []
+  spawnPoints:
+  - {fileID: 7903164669676765637, guid: a56b718e881f84745af4f094acbad743, type: 3}
+  VStageBoss: {fileID: 4107073848118516672, guid: d97bed847a1c85b469a36f54db522e2f, type: 3}
+  XStageBoss: {fileID: 641434251526285591, guid: 6a3e87dadea7f70418c5dcf29af63bac, type: 3}
+  LastStageBoss: {fileID: 7138157113967968615, guid: f51ef93a38e258b458a14df084911d91, type: 3}
+  bossSpawnPoint: {fileID: 17784830839589684, guid: 9b82d0bf97f31a249a260ec574189e3c, type: 3}

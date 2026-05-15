@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1cc8811971313049b4279df0763a595, type: 3}
+  m_Name: BigBoss
+  m_EditorClassIdentifier: 
+  enemyName: Big Boss
+  health: 200
+  speed: 1
+  attackDamage: 30
+  enemyModel: {fileID: 5635429535640507193, guid: 2f0c0b7e69f46824f89b2cf1cc6d833f, type: 3}
+  senseLocate: 1
+  attackSpeed: 4
+  attackReach: 7
+  expGiven: 200
+  offset: 2.5
+  durabilityCost: 15

@@ -1,23 +1,30 @@
+using System.ComponentModel.Design;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using System.Collections;
 
 public class BaseEnemy : MonoBehaviour
 {
     public EnemyInfo enemyInfo;
+    public Transform weaponHandler;
     private SpriteRenderer sr;
     public bool playerDetect;
     public DetectionArea DetectionArea;
     public bool isGettingHit;
     public bool hitArea;
     public float health;
+    public float maxHealth;
+    public float attackDamage;
     public AttackArea AttackArea;
     public GameObject Sense;
     public float waitTimer = 1.0f;
     public float Timer;
     public float attackTimer;
+    public float expGiven;
     private Player player;
     private Rigidbody2D rb;
     public float knockbackForce = 2000f;
+    public WeaponHandler weaponHandlerScript;
     
     
     // 1. เพิ่มตัวแปรเพื่อเก็บข้อมูลตำแหน่งของ Player
@@ -25,9 +32,20 @@ public class BaseEnemy : MonoBehaviour
 
     void Start()
     {
+        
+        weaponHandlerScript = weaponHandler.GetComponent<WeaponHandler>();
         AttackArea.transform.localScale = new Vector3(enemyInfo.attackReach , enemyInfo.attackReach , enemyInfo.attackReach);
         UpdateWeaponVisual();
         health = enemyInfo.health;
+        attackDamage = enemyInfo.attackDamage;
+        expGiven = enemyInfo.expGiven;
+        if (InGameScript.currentStage > 0)
+        {
+            health = enemyInfo.health * Mathf.Pow(1.025f, InGameScript.currentStage - 1);
+            attackDamage += 0.5f * (InGameScript.currentStage - 1);
+            expGiven = enemyInfo.expGiven * Mathf.Pow(1.05f, InGameScript.currentStage - 1);
+        }
+        maxHealth = health;
         Timer = waitTimer;
         Sense.transform.localPosition = new Vector3(Sense.transform.localPosition.x, Sense.transform.localPosition.y + enemyInfo.senseLocate, Sense.transform.localPosition.z);
         
@@ -37,6 +55,7 @@ public class BaseEnemy : MonoBehaviour
         if (playerObj != null)
         {
             player = playerObj.GetComponent<Player>();
+            playerTransform = playerObj.transform;
         }
 
         rb = GetComponent<Rigidbody2D>();
@@ -44,6 +63,10 @@ public class BaseEnemy : MonoBehaviour
 
     void Update()
     {   
+        if (player.attackTimer <= 0)
+        {
+            isGettingHit = false;
+        }
         HealthUpdate();
         if (attackTimer > 0)
         {
@@ -84,13 +107,15 @@ public class BaseEnemy : MonoBehaviour
         {
             Debug.Log("dead");
             this.gameObject.SetActive(false);
+            player.currentEXP += enemyInfo.expGiven;
         }
     }
+
     void MoveTowardsPlayer()
     {
         float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
 
-        float offset = 2.5f; 
+        float offset = enemyInfo.offset; 
 
         if (distanceToPlayer > offset)
         {
@@ -157,19 +182,13 @@ public class BaseEnemy : MonoBehaviour
                 if (!isGettingHit)
                 {
                     Debug.Log("<color=Red>โดนตัวเน้นๆ!</color>");
-                    health -= player.attackDamage;
+                    health -= player.attackDamage + (player.attackDamage * (player.bonusAttackDamage/100));
+                    Debug.Log("เสียเลือดไป : " + (player.attackDamage + (player.attackDamage * (player.bonusAttackDamage/100))));
                     isGettingHit = true;
                     ApplyKnockback(collision.transform.position);
+                    weaponHandlerScript.DecreaseDurability(enemyInfo.durabilityCost);
                 }
             }
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision) 
-    {
-        if (collision.gameObject.CompareTag("PlayerAttackHitBox"))
-        {
-            isGettingHit = false;
         }
     }
 }

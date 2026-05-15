@@ -16,18 +16,34 @@ public class Player : MonoBehaviour
     private Camera mainCam; 
     private SpriteRenderer handSR;
     private SpriteRenderer weaponSR;
+    public GameObject selectionUI;
+    public bool isHand;
 
     [Header("PlayerStat")]
+    public int level = 1;
+    public float maxHealth = 100;
     public float health = 100;
     public float attackDamage;
+    public float totalDamage;
     public float attackTime;
     public float attackTimer;
+    public float maxEXP = 20;
+    public float currentEXP;
+    private float remainingEXP;
+
     private float baseAngle;
     private bool isMouseOnLeft;
     private float mousePos;
-    private float shootTargetPos;
     private bool weaponInRange = false;
+    public bool isSelecting;
     public float knockbackForce = 2000f;
+
+    [Header("PlayerBoost")]
+    public float bonusHealth;
+    public float bonusAttackDamage;
+    public float bonusAttackSpeed;
+    
+    
     void Start()
     {
         mainCam = Camera.main; 
@@ -38,18 +54,33 @@ public class Player : MonoBehaviour
 
         weaponSR = weaponHandler.GetComponent<SpriteRenderer>();
         weaponHandlerScript = weaponHandler.GetComponent<WeaponHandler>();
+        health = maxHealth;
     }
 
     void Update()
     {
+        if (attackTime < 0.1f)
+        {
+            attackTime = 0.1f;
+        }
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
         moveInput = moveInput.normalized;
 
         HandleFlipAndMovementLogic();
-        
-        
+        totalDamage = attackDamage + (attackDamage * (bonusAttackDamage/100));
+
+        if (health > maxHealth)
+        {
+            health = maxHealth;
+        }
+
         Attack();
+        //LevelUp();
+        if (currentEXP >= maxEXP && !isSelecting)
+        {
+            StartCoroutine(LevelUpRoutine());
+        }
 
         if (weaponInRange && Input.GetKeyDown(KeyCode.E))
         {
@@ -57,6 +88,57 @@ public class Player : MonoBehaviour
         }
     }
 
+    void LevelUp()
+    {
+        if (currentEXP >= maxEXP)
+        {
+            currentEXP -= maxEXP;
+            level += 1;
+            maxEXP *= 1.25f;
+
+            Time.timeScale = 0f;
+            selectionUI.SetActive(true);
+            selectionUI.GetComponent<CardSelect>().ShowCard();
+        }
+    }
+    IEnumerator LevelUpRoutine()
+    {
+        isSelecting = true;
+
+        while (currentEXP >= maxEXP)
+        {
+            currentEXP -= maxEXP;
+            level += 1;
+            maxEXP *= 1.25f; 
+
+            Transform cardDisplay = selectionUI.transform.Find("Card Display");
+            Time.timeScale = 0f; 
+
+            cardDisplay.gameObject.SetActive(true);
+
+            CardSelect cardScript = selectionUI.GetComponent<CardSelect>();
+            if (cardScript != null)
+            {
+                cardScript.ShowCard();
+            }
+
+            yield return new WaitUntil(() => isSelecting == false);
+
+            cardDisplay.gameObject.SetActive(false);
+
+            if (currentEXP >= maxEXP) 
+            {
+                isSelecting = true; 
+
+                yield return new WaitForSecondsRealtime(0.1f);
+            }
+        }
+
+        isSelecting = false;
+        Time.timeScale = 1f;
+
+        Debug.Log("เลเวลอัปเสร็จสิ้น! เลเวลปัจจุบัน: " + level);
+    }
     public void ApplyKnockback(Vector3 attackerPos, float force, float duration) 
     {
         // คำนวณทิศทาง (จากคนตี -> มาที่ตัว Player)
@@ -110,7 +192,7 @@ public class Player : MonoBehaviour
 
         // 3. เอาของจากพื้นขึ้นมือ (พร้อมค่าความทนทานของมัน)
         weaponHandlerScript.SetWeapon(groundData, groundRarity, groundDurability);
-        attackTime = weaponHandlerScript.currentWeapon.attackSpeed;
+        attackTime = weaponHandlerScript.currentWeapon.attackSpeed - (weaponHandlerScript.currentWeapon.attackSpeed * bonusAttackSpeed/100);
         attackDamage = weaponHandlerScript.currentWeapon.baseDamage + weaponHandlerScript.currentRarity.rarityDamage;;
 
         Debug.Log(weaponHandlerScript.currentWeapon.attackReach);
@@ -144,12 +226,8 @@ public class Player : MonoBehaviour
                         string rName = weaponHandlerScript.currentRarity.rarityName; // สมมติว่ามีชื่อใน SO
 
                         // 2. ลดความทนทาน (ถ้าพัง currentWeapon จะกลายเป็น null ในบรรทัดนี้)
-                        float durabilityCost = 10f;
-                        weaponHandlerScript.DecreaseDurability(durabilityCost);
-
-                        // 3. แสดงผลโดยใช้ตัวแปรที่เราจดไว้ (ไม่ไปดึงจาก currentWeapon โดยตรงแล้ว)
-                        // ใช้ string.Format หรือ interpolation จะอ่านง่ายขึ้นครับเจมส์
                         Debug.Log($"ตีด้วย {wName} | ความแรงรวม: {finalDmg} | ระดับ: {rName} | ความเร็วโจมตี: {weaponHandlerScript.currentWeapon.attackSpeed} |ความคงทนเหลือ: {weaponHandlerScript.currentDurability}");
+                        
 
                         // 4. เช็กเสริมเผื่ออยากรู้ว่าพังหรือยัง
                         if (weaponHandlerScript.currentWeapon == null)
@@ -193,6 +271,13 @@ public class Player : MonoBehaviour
             }
         }
     }
+    public void ResetAttack()
+    {
+        attackTimer = 0; // หยุดการนับเวลาโจมตี
+        HitBox.gameObject.SetActive(false); // ปิด Hitbox ทันที
+        // คืนค่าตำแหน่งหมุนของมือให้เป็นปกติ (0 องศา หรือตำแหน่งเริ่มต้น)
+        handTransform.localRotation = Quaternion.identity; 
+    }
     void HandleFlipAndMovementLogic()
     {
         Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
@@ -200,8 +285,7 @@ public class Player : MonoBehaviour
         
         
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        
-        Debug.Log(isMouseOnLeft);
+
         if (attackTimer <= 0)
         {   
             HitBox.gameObject.SetActive(false);
@@ -296,6 +380,10 @@ public class Player : MonoBehaviour
                 weaponInRange = true;
                 weaponNew = item;
             }
+        }
+        if (collision.gameObject.CompareTag("Hand"))
+        {
+            isHand = true;
         }
     }
 
