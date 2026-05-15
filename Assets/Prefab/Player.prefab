@@ -208,7 +208,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1527281339
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 1
   m_Sprite: {fileID: -2273262987894464175, guid: 172c6744b885aff498b280b7a9d7d7e5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -235,6 +235,7 @@ GameObject:
   - component: {fileID: 1321071969838383596}
   - component: {fileID: 8702338488283918465}
   - component: {fileID: 4372116817419974988}
+  - component: {fileID: 5743998353084831094}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -252,8 +253,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.8351498, y: -0.34444237, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3599683031997835871}
   - {fileID: 8206217961680028283}
@@ -323,6 +324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d6586ebaad9bc47b307221d22a00d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerSpawn: {fileID: 0}
   handTransform: {fileID: 8206217961680028283}
   weaponHandler: {fileID: 4629951946785405918}
   HitBox: {fileID: 653735416445886891}
@@ -334,13 +336,11 @@ MonoBehaviour:
   - {fileID: 5692998665791819969}
   - {fileID: 5757859638603538365}
   rb: {fileID: 3645904855680703445}
-  moveInput: {x: 0, y: 0}
   animator: {fileID: 7503053751795705438}
-  weaponHandlerScript: {fileID: 0}
-  weaponNew: {fileID: 0}
-  speed: 5
-  selectionUI: {fileID: 6653994012635051028, guid: 0780e62dabd794546954fe02db8c84c1, type: 3}
-  isHand: 0
+  weaponHandlerScript: {fileID: 6523492119523214575, guid: b74550e8711140644a904043315afbad, type: 3}
+  selectionUI: {fileID: 0}
+  speed: 20
+  moveInput: {x: 0, y: 0}
   level: 1
   maxHealth: 100
   health: 100
@@ -350,11 +350,19 @@ MonoBehaviour:
   attackTimer: 0
   maxEXP: 20
   currentEXP: 0
-  isSelecting: 0
-  knockbackForce: 2000
   bonusHealth: 0
   bonusAttackDamage: 0
   bonusAttackSpeed: 0
+  isHand: 0
+  isSelecting: 0
+  weaponInRange: 0
+  weaponNew: {fileID: 0}
+  isDead: 0
+  speedMultiplier: 1
+  swingSound: {fileID: 0}
+  footstepSounds: []
+  equipSound: {fileID: 0}
+  footstepInterval: 0.4
 --- !u!70 &8702338488283918465
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -429,6 +437,24 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: -0.37}
   m_Size: {x: 1.0142024, y: 1.0142024}
   m_Direction: 0
+--- !u!114 &5743998353084831094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5039814004455796719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c33c1423b613ec84bb066c174a0d2b08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  randomScenes:
+  - inGame_2
+  - inGame_3
+  - inGame_4
+  - inGame_5
+  detectionRadius: 1.5
 --- !u!1 &5314168537179473684
 GameObject:
   m_ObjectHideFlags: 0
@@ -503,7 +529,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1527281339
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 3871034404151536601, guid: 172c6744b885aff498b280b7a9d7d7e5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -590,7 +616,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1527281339
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: -1410163375985073761, guid: 172c6744b885aff498b280b7a9d7d7e5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -679,7 +705,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1527281339
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 8113368496836147963, guid: 172c6744b885aff498b280b7a9d7d7e5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -766,7 +792,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1527281339
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: -8348016747007819476, guid: 172c6744b885aff498b280b7a9d7d7e5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

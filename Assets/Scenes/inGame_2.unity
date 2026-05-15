@@ -1530,10 +1530,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c33c1423b613ec84bb066c174a0d2b08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  randomScenes:
+  - inGame_2
+  - inGame_3
+  - inGame_4
+  - inGame_5
   detectionRadius: 1.5
-  doorLayer:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!4 &702771730 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6991665236151235379, guid: 727df407796ed334bb27b9a0e82d8364, type: 3}
@@ -3471,8 +3473,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 938bd2b78e784054ab72c213f76a5aba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smoothSpeed: 5
-  offset: {x: 0, y: 0, z: -10}
 --- !u!1 &1968981328
 GameObject:
   m_ObjectHideFlags: 0

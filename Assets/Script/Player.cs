@@ -1,3 +1,4 @@
+using System.Transactions;
 using UnityEngine;
 using System.Collections;
 
@@ -22,6 +23,7 @@ public class Player : MonoBehaviour
     }
 
     [Header("Core References")]
+    public Transform playerSpawn;
     public Transform handTransform;
     public Transform weaponHandler;
     public Transform HitBox;
