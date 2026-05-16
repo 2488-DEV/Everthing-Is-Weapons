@@ -197,8 +197,9 @@ public class BossEnemy : MonoBehaviour
         {
             Debug.Log("dead");
             CleanUpAttacks();
-            this.gameObject.SetActive(false);
+            InGameScript.currentEnemyCount -= 1;
             player.currentEXP += enemyInfo.expGiven;
+            this.gameObject.SetActive(false);
         }
     }
 

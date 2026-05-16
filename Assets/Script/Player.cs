@@ -510,6 +510,10 @@ public class Player : MonoBehaviour
         bool isBackstepping = false;
         if (moveInput.x != 0)
         {
+            if (isMouseOnLeft)
+            {
+                isBackstepping = true;
+            }
             bool movingOpposite = (isMouseOnLeft && moveInput.x > 0) || (!isMouseOnLeft && moveInput.x < 0);
             isBackstepping = movingOpposite;
             currentSpeed = movingOpposite ? speed * 0.5f : speed;

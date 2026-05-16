@@ -160,6 +160,7 @@ public class SpiderEnemy : MonoBehaviour
         if (health <= 0)
         {
             player.currentEXP += expGiven;
+            InGameScript.currentEnemyCount -= 1;
             gameObject.SetActive(false);
         }
     }

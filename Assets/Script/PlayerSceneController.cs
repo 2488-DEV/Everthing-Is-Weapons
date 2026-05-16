@@ -78,16 +78,19 @@ public class PlayerSceneController : MonoBehaviour
 
     private void LoadRandomScene()
     {
-        if (randomScenes != null && randomScenes.Length > 0)
+        if (InGameScript.currentEnemyCount == 0)
         {
-            int randomIndex = Random.Range(0, randomScenes.Length);
-            string sceneToLoad = randomScenes[randomIndex];
-            Debug.Log("[PlayerSceneController] Loading random scene: " + sceneToLoad);
-            SceneManager.LoadScene(sceneToLoad);
-        }
-        else
-        {
-            Debug.LogWarning("[PlayerSceneController] No scenes assigned to randomize!");
+            if (randomScenes != null && randomScenes.Length > 0)
+            {
+                int randomIndex = Random.Range(0, randomScenes.Length);
+                string sceneToLoad = randomScenes[randomIndex];
+                Debug.Log("[PlayerSceneController] Loading random scene: " + sceneToLoad);
+                SceneManager.LoadScene(sceneToLoad);
+            }
+            else
+            {
+                Debug.LogWarning("[PlayerSceneController] No scenes assigned to randomize!");
+            }
         }
     }
 

@@ -169,6 +169,7 @@ public class BaseEnemy : MonoBehaviour
             // ให้ EXP กับ Player ตัวที่ยังมีชีวิตอยู่
             Player p = GameObject.FindGameObjectWithTag("Player")?.GetComponent<Player>();
             if (p != null) p.currentEXP += expGiven;
+            InGameScript.currentEnemyCount -= 1;
 
             gameObject.SetActive(false);
         }
