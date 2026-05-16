@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cd4daa7cf86f2341bb386df8da2e419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isBoss: 0
   stageIToVEnemy:
   - {fileID: 8365487459537967655, guid: 9980e22cd520baf47a213fa852e9363f, type: 3}
   stageVIToXEnemy:

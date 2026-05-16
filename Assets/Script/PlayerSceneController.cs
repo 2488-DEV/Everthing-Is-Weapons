@@ -19,6 +19,17 @@ public class PlayerSceneController : MonoBehaviour
     void Start()
     {
         Debug.Log("[PlayerSceneController] Script is attached and running on: " + gameObject.name);
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        hasTriggered = false;
     }
 
     void Update()
@@ -47,6 +58,7 @@ public class PlayerSceneController : MonoBehaviour
 
         if (!hasTriggered && collision.CompareTag("Door"))
         {
+            InGameScript.NextStage();
             hasTriggered = true;
             LoadRandomScene();
         }
@@ -58,6 +70,7 @@ public class PlayerSceneController : MonoBehaviour
 
         if (!hasTriggered && collision.gameObject.CompareTag("Door"))
         {
+            InGameScript.NextStage();
             hasTriggered = true;
             LoadRandomScene();
         }

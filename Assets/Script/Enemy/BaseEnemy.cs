@@ -20,6 +20,11 @@ public class BaseEnemy : MonoBehaviour
     private Transform playerTransform;
     private WeaponHandler weaponHandlerScript;
 
+    [Header("Attack Animation")]
+    public float spinDuration = 0.2f;
+    public float spinSpeed = 1800f;
+    public float lungeDistance = 1.5f;
+
     [Header("Status (Read Only)")]
     public float health;
     public float maxHealth;
@@ -30,6 +35,7 @@ public class BaseEnemy : MonoBehaviour
     public bool playerDetect;
     public bool isGettingHit;
     public bool hitArea;
+    public bool isAttacking;
 
     void Start()
     {
@@ -108,14 +114,12 @@ public class BaseEnemy : MonoBehaviour
         }
     }
 
-    // --- ส่วนที่อัปเกรด: Attack แบบเจาะจงเป้าหมายสดใหม่ ---
     void Attack()
     {
-        if (hitArea && attackTimer <= 0)
+        if (hitArea && attackTimer <= 0 && !isAttacking)
         {
             attackTimer = enemyInfo.attackSpeed;
 
-            // ค้นหา Player ที่ Active อยู่ในฉากจริงๆ ณ วินาทีที่ตบ
             GameObject target = GameObject.FindGameObjectWithTag("Player");
 
             if (target != null)
@@ -130,7 +134,32 @@ public class BaseEnemy : MonoBehaviour
                     Debug.Log($"<color=yellow>{gameObject.name}:</color> ตบเข้าจังๆ! ดาเมจ: {attackDamage} | เลือดเป้าหมายเหลือ: {targetPlayer.health}");
                 }
             }
+
+            StartCoroutine(AttackSpinCoroutine());
         }
+    }
+
+    IEnumerator AttackSpinCoroutine()
+    {
+        isAttacking = true;
+
+        Vector3 startPos = transform.position;
+        Vector3 lungeDir = playerTransform != null
+            ? (playerTransform.position - transform.position).normalized
+            : Vector3.zero;
+
+        float elapsed = 0f;
+        while (elapsed < spinDuration)
+        {
+            float t = elapsed / spinDuration;
+            transform.Rotate(0, 0, spinSpeed * Time.deltaTime);
+            transform.position = Vector3.Lerp(startPos, startPos + lungeDir * lungeDistance, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.rotation = Quaternion.identity;
+        isAttacking = false;
     }
 
     void HealthUpdate()

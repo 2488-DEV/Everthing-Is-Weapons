@@ -248,8 +248,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 938bd2b78e784054ab72c213f76a5aba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smoothSpeed: 5
-  offset: {x: 0, y: 0, z: -10}
 --- !u!1 &117546832
 GameObject:
   m_ObjectHideFlags: 0
@@ -1558,6 +1556,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: InGameUI
       objectReference: {fileID: 0}
+    - target: {fileID: 8022697010781313373, guid: 0780e62dabd794546954fe02db8c84c1, type: 3}
+      propertyPath: easeSlider
+      value: 
+      objectReference: {fileID: 1207264652}
+    - target: {fileID: 8022697010781313373, guid: 0780e62dabd794546954fe02db8c84c1, type: 3}
+      propertyPath: mainSlider
+      value: 
+      objectReference: {fileID: 1207264652}
     - target: {fileID: 8658059134471543767, guid: 0780e62dabd794546954fe02db8c84c1, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -1817,7 +1823,7 @@ Transform:
   m_GameObject: {fileID: 1189043792}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.1459045, y: -5.6317024, z: -10}
+  m_LocalPosition: {x: -3.1662598, y: -5.6317024, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1958,6 +1964,17 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!114 &1207264652 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5618629566019496840, guid: 0780e62dabd794546954fe02db8c84c1, type: 3}
+  m_PrefabInstance: {fileID: 1005041945}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!82 &1258943262 stripped
 AudioSource:
   m_CorrespondingSourceObject: {fileID: 8297190100931364168, guid: da9bea058dc779948a8b74dcfbbb9ee1, type: 3}
