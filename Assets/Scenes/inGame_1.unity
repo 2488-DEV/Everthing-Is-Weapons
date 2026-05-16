@@ -2035,7 +2035,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1321071969838383596, guid: 727df407796ed334bb27b9a0e82d8364, type: 3}
       propertyPath: speed
-      value: 8
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1321071969838383596, guid: 727df407796ed334bb27b9a0e82d8364, type: 3}
       propertyPath: winPanel
