@@ -1,5 +1,5 @@
-using System.Transactions;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class Player : MonoBehaviour
@@ -13,6 +13,7 @@ public class Player : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
@@ -20,6 +21,19 @@ public class Player : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+    }
+
+    void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (playerSpawn == null)
+            playerSpawn = GameObject.Find("PlayerSpawnPoint")?.transform;
+        if (playerSpawn != null)
+            transform.position = playerSpawn.position;
     }
 
     [Header("Core References")]
@@ -75,7 +89,6 @@ public class Player : MonoBehaviour
     [Header("Audio")]
     public AudioSource audioSource;
     public AudioClip swingSound;
-    public AudioClip[] footstepSounds;
     public AudioClip equipSound;
     public float footstepInterval = 0.4f;
 
@@ -89,7 +102,7 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        RefreshReferences(); // เรียกใช้การหา Reference เริ่มต้น
+ // เรียกใช้การหา Reference เริ่มต้น
 
         if (characterParts.Length > 4) handSR = characterParts[4];
         weaponSR = weaponHandler.GetComponent<SpriteRenderer>();
@@ -100,7 +113,8 @@ public class Player : MonoBehaviour
     }
 
     void Update()
-    {
+    {   
+        RefreshReferences();
         if (isDead) return;
 
         // --- ส่วนที่แก้ไข: "ฉลาดข้ามฉาก" เช็ก Reference ที่อาจพังเมื่อเปลี่ยน Scene ---
@@ -125,7 +139,6 @@ public class Player : MonoBehaviour
         }
 
         HandleFlipAndMovementLogic();
-        HandleFootstepSounds();
         HandleStatsAndExperience();
         Attack();
 
@@ -140,8 +153,9 @@ public class Player : MonoBehaviour
     {
         mainCam = Camera.main;
         if (selectionUI == null) selectionUI = GameObject.Find("InGameUI");
+        if (deadPanel == null) deadPanel = GameObject.Find("dead panel");
+        if (winPanel == null) winPanel = GameObject.Find("victory panel");
     }
-
     void HandleStatsAndExperience()
     {
         float currentMax = maxHealth + bonusHealth;
@@ -159,34 +173,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    void HandleFootstepSounds()
-    {
-        if (footstepSounds == null || footstepSounds.Length == 0) return;
 
-        if (moveInput != Vector2.zero)
-        {
-            footstepTimer -= Time.deltaTime;
-            if (footstepTimer <= 0)
-            {
-                footstepTimer = footstepInterval;
-                PlayFootstep();
-            }
-        }
-        else
-        {
-            footstepTimer = 0;
-        }
-    }
-
-    void PlayFootstep()
-    {
-        if (footstepSounds.Length == 0) return;
-
-        lastFootstepIndex = (lastFootstepIndex + 1) % footstepSounds.Length;
-        AudioClip clip = footstepSounds[lastFootstepIndex];
-        if (SoundManagers.instance != null)
-            SoundManagers.instance.PlayFootstep(clip);
-    }
 
     void Die()
     {
@@ -475,8 +462,7 @@ public class Player : MonoBehaviour
         attackDamage = groundData.baseDamage + groundRarity.rarityDamage;
         HitBox.localScale = new Vector3(0.5f, groundData.attackReach / 1.2f, 0.5f);
 
-        if (SoundManagers.instance != null)
-            SoundManagers.instance.PlaySFX(equipSound);
+        audioSource.PlayOneShot(equipSound);
 
         if (handData != null) weaponNew.SetWeapon(handData, handRarity, handDurability);
         else Destroy(weaponNew.gameObject);

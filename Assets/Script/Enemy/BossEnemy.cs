@@ -199,6 +199,11 @@ public class BossEnemy : MonoBehaviour
             CleanUpAttacks();
             InGameScript.currentEnemyCount -= 1;
             player.currentEXP += enemyInfo.expGiven;
+            if (this.name.StartsWith("BigBoss"))
+            {
+                Time.timeScale = 0f;
+                player.winPanel.SetActive(true);
+            }
             this.gameObject.SetActive(false);
         }
     }

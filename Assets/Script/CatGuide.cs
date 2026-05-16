@@ -1,11 +1,12 @@
 using UnityEngine;
+using TMPro;
 
 public class CatGuide : MonoBehaviour
 {
     [SerializeField] private Transform catStopPoint;
     [SerializeField] private float speed = 3f;
     [SerializeField] private float stopDistance = 0.1f;
-
+    public TextMeshProUGUI text;
     private SpriteRenderer spriteRenderer;
     public bool hasReachedStopPoint;
     private bool playerInRange;
@@ -24,7 +25,26 @@ public class CatGuide : MonoBehaviour
     }
 
     void Update()
-    {
+    {   
+        if (hasReachedStopPoint)
+        {
+            if (InGameScript.currentStage == 1)
+            {
+                text.text = "Every time you hit you'll lose your sanity so be careful";
+            } 
+            else if (InGameScript.currentStage == 4)
+            {
+                text.text = "The next room is stronger one";
+            } 
+            else if (InGameScript.currentStage == 9)
+            {
+                text.text = "It stronger";
+            }
+            else if (InGameScript.currentStage == 24)
+            {
+                text.text = "This is it";
+            }
+        }   
         if (hasReachedStopPoint || catStopPoint == null || !playerInRange)
             return;
 

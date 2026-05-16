@@ -18,7 +18,7 @@ public class InGameScript
         else
         {
             currentStage += 1;
-            enemyCount = 3;
+            enemyCount = 5;
             Debug.Log("Stage : " + currentStage);
             currentEnemyCount = enemyCount;
         }

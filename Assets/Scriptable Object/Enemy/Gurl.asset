@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c1cc8811971313049b4279df0763a595, type: 3}
-  m_Name: Cockroach
+  m_Name: Gurl
   m_EditorClassIdentifier: 
-  enemyName: Cockroach
+  enemyName: Gurl
   health: 10
-  speed: 3.5
-  attackDamage: 10
-  enemyModel: {fileID: 8001642312560475234, guid: 7d1d01e9186783f42880e4a8820247df, type: 3}
+  speed: 3
+  attackDamage: 5
+  enemyModel: {fileID: -8771350949733757393, guid: b1cea02f58c524047b9236e5a20bda24, type: 3}
   senseLocate: 1
   attackSpeed: 2.5
   attackReach: 5
   expGiven: 45
-  offset: 2.5
+  offset: 4
   durabilityCost: 10
