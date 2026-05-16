@@ -192,6 +192,7 @@ public class Player : MonoBehaviour
     {
         isDead = true;
         deadPanel.SetActive(true);
+        Time.timeScale = 0f;
         Debug.Log("<color=red>Player HAS DIED!</color>");
     }
 

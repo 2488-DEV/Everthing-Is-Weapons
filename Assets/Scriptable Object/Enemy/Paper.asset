@@ -15,7 +15,7 @@ MonoBehaviour:
   enemyName: 
   health: 10
   speed: 3
-  attackDamage: 1
+  attackDamage: 5
   enemyModel: {fileID: 7364966758012338123, guid: 2f263316cd52e9c439b81e83e0f98736, type: 3}
   senseLocate: 1
   attackSpeed: 2.5
