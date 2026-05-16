@@ -104,15 +104,15 @@ public class BossEnemy : MonoBehaviour
                 LookAtPlayer();
                 if (attackTimer <= 0 && !isAttacking)
                 {
-                    if (this.name == "Boss")
+                    if (this.name.StartsWith("Boss"))
                     {
                         ChooseBossMove();
                     }
-                    else if (this.name == "DogBoss")
+                    else if (this.name.StartsWith("DogBoss"))
                     {
                         ChooseDogBossMove();
                     }
-                    else if (this.name == "BigBoss")
+                    else if (this.name.StartsWith("BigBoss"))
                     {
                         ChooseBigBossMove();
                     }

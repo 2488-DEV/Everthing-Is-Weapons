@@ -56,6 +56,10 @@ public class Player : MonoBehaviour
     public float bonusAttackDamage;
     public float bonusAttackSpeed;
 
+    [Header("UI")]
+    public GameObject deadPanel;
+    public GameObject winPanel;
+
     [Header("State Flags")]
     public bool isHand;
     public bool isSelecting;
@@ -187,6 +191,7 @@ public class Player : MonoBehaviour
     void Die()
     {
         isDead = true;
+        deadPanel.SetActive(true);
         Debug.Log("<color=red>Player HAS DIED!</color>");
     }
 

@@ -360,6 +360,7 @@ MonoBehaviour:
   weaponNew: {fileID: 0}
   isDead: 0
   speedMultiplier: 1
+  audioSource: {fileID: 0}
   swingSound: {fileID: 0}
   footstepSounds: []
   equipSound: {fileID: 0}
@@ -456,6 +457,10 @@ MonoBehaviour:
   - inGame_4
   - inGame_5
   detectionRadius: 1.5
+  isEnemyLeft: 0
+  catGuide: {fileID: 5908330514713750204, guid: ab805c26fed78ae45a7303b232410631, type: 3}
+  enemies: []
+  bosses: []
 --- !u!1 &5314168537179473684
 GameObject:
   m_ObjectHideFlags: 0

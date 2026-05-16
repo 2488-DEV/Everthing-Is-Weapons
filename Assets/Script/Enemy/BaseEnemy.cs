@@ -146,18 +146,29 @@ public class BaseEnemy : MonoBehaviour
         Vector3 lungeDir = playerTransform != null
             ? (playerTransform.position - transform.position).normalized
             : Vector3.zero;
+        Vector3 lungedPos = startPos + lungeDir * lungeDistance;
 
         float elapsed = 0f;
         while (elapsed < spinDuration)
         {
             float t = elapsed / spinDuration;
             transform.Rotate(0, 0, spinSpeed * Time.deltaTime);
-            transform.position = Vector3.Lerp(startPos, startPos + lungeDir * lungeDistance, t);
+            transform.position = Vector3.Lerp(startPos, lungedPos, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        elapsed = 0f;
+        while (elapsed < spinDuration)
+        {
+            float t = elapsed / spinDuration;
+            transform.position = Vector3.Lerp(lungedPos, startPos, t);
             elapsed += Time.deltaTime;
             yield return null;
         }
 
         transform.rotation = Quaternion.identity;
+        transform.position = startPos;
         isAttacking = false;
     }
 

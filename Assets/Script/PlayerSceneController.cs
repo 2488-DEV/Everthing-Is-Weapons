@@ -17,10 +17,13 @@ public class PlayerSceneController : MonoBehaviour
     private bool hasTriggered = false;
 
     public bool isEnemyLeft;
+    public CatGuide catGuide; 
     public GameObject[] enemies;
     public GameObject[] bosses;
     void Start()
     {
+        if (catGuide == null)
+            catGuide = FindObjectOfType<CatGuide>();
         Debug.Log("[PlayerSceneController] Script is attached and running on: " + gameObject.name);
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -33,6 +36,7 @@ public class PlayerSceneController : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         hasTriggered = false;
+        catGuide = FindObjectOfType<CatGuide>();
     }
 
     void Update()
@@ -78,7 +82,7 @@ public class PlayerSceneController : MonoBehaviour
 
     private void LoadRandomScene()
     {
-        if (!isEnemyLeft)
+        if (!isEnemyLeft && catGuide.hasReachedStopPoint)
         {
             if (randomScenes != null && randomScenes.Length > 0)
             {

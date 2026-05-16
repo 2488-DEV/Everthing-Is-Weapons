@@ -7,13 +7,20 @@ public class CatGuide : MonoBehaviour
     [SerializeField] private float stopDistance = 0.1f;
 
     private SpriteRenderer spriteRenderer;
-    private bool hasReachedStopPoint;
+    public bool hasReachedStopPoint;
     private bool playerInRange;
 
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        hasReachedStopPoint = false;
+        if (catStopPoint == null)
+        {
+            hasReachedStopPoint = true;
+        }
+        else 
+        {
+            hasReachedStopPoint = false;
+        }
     }
 
     void Update()
