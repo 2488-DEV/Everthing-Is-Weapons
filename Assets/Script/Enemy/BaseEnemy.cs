@@ -204,7 +204,22 @@ public class BaseEnemy : MonoBehaviour
         StopCoroutine("KnockbackLerp");
         Vector2 direction = (transform.position - attackerPos).normalized;
         Vector2 targetPos = (Vector2)transform.position + (direction * 2f);
+        targetPos = ClampToCameraBounds(targetPos);
         StartCoroutine(KnockbackLerp(targetPos, 0.1f));
+    }
+
+    Vector2 ClampToCameraBounds(Vector2 position)
+    {
+        Camera cam = Camera.main;
+        if (cam == null) return position;
+
+        Vector3 bottomLeft = cam.ViewportToWorldPoint(new Vector3(0, 0, -cam.transform.position.z));
+        Vector3 topRight = cam.ViewportToWorldPoint(new Vector3(1, 1, -cam.transform.position.z));
+
+        float margin = 0.5f;
+        float clampedX = Mathf.Clamp(position.x, bottomLeft.x + margin, topRight.x - margin);
+        float clampedY = Mathf.Clamp(position.y, bottomLeft.y + margin, topRight.y - margin);
+        return new Vector2(clampedX, clampedY);
     }
 
     IEnumerator KnockbackLerp(Vector2 target, float duration)

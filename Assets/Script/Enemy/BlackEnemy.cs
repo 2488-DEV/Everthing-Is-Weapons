@@ -164,14 +164,60 @@ public class BlackEnemy : MonoBehaviour
 
     void MoveAwayFromPlayer()
     {
-        // คำนวณทิศทางหนี (ถอยหลังจาก Player)
+        float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
+        float retreatDistance = GetRetreatDistance();
+
+        if (distanceToPlayer >= retreatDistance) return;
+        if (IsNearMapEdge()) return;
+
         Vector2 directionAway = (transform.position - playerTransform.position).normalized;
         Vector2 targetPos = (Vector2)transform.position + directionAway;
+        targetPos = ClampToCameraBounds(targetPos);
 
         transform.position = Vector2.MoveTowards(transform.position, targetPos, enemyInfo.speed * Time.deltaTime);
 
-        // หันหน้าจ้อง Player ตลอดเวลา (Moonwalk)
         if (sr != null) sr.flipX = (playerTransform.position.x >= transform.position.x);
+    }
+
+    float GetRetreatDistance()
+    {
+        Camera cam = Camera.main;
+        if (cam != null)
+            return cam.orthographicSize * 0.7f;
+        return 3f;
+    }
+
+    bool IsNearMapEdge()
+    {
+        Camera cam = Camera.main;
+        if (cam == null) return false;
+
+        Vector3 bottomLeft = cam.ViewportToWorldPoint(new Vector3(0, 0, -cam.transform.position.z));
+        Vector3 topRight = cam.ViewportToWorldPoint(new Vector3(1, 1, -cam.transform.position.z));
+
+        float wallRadius = 2f;
+        Vector2 pos = transform.position;
+
+        if (pos.x - bottomLeft.x < wallRadius) return true;
+        if (topRight.x - pos.x < wallRadius) return true;
+        if (pos.y - bottomLeft.y < wallRadius) return true;
+        if (topRight.y - pos.y < wallRadius) return true;
+
+        return false;
+    }
+
+    Vector2 ClampToCameraBounds(Vector2 position)
+    {
+        Camera cam = Camera.main;
+        if (cam == null) return position;
+
+        Vector3 bottomLeft = cam.ViewportToWorldPoint(new Vector3(0, 0, -cam.transform.position.z));
+        Vector3 topRight = cam.ViewportToWorldPoint(new Vector3(1, 1, -cam.transform.position.z));
+
+        float margin = 0.5f;
+        float clampedX = Mathf.Clamp(position.x, bottomLeft.x + margin, topRight.x - margin);
+        float clampedY = Mathf.Clamp(position.y, bottomLeft.y + margin, topRight.y - margin);
+        return new Vector2(clampedX, clampedY);
     }
 
     void UpdateWeaponVisual()
@@ -182,9 +228,10 @@ public class BlackEnemy : MonoBehaviour
 
     public void ApplyKnockback(Vector3 attackerPos)
     {
-        StopCoroutine("KnockbackLerp"); // หยุดตัวเก่าก่อนถ้ามี
+        StopCoroutine("KnockbackLerp");
         Vector2 direction = (transform.position - attackerPos).normalized;
         Vector2 targetPos = (Vector2)transform.position + (direction * 2f);
+        targetPos = ClampToCameraBounds(targetPos);
         StartCoroutine(KnockbackLerp(targetPos, 0.1f));
     }
 
