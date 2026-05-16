@@ -49,8 +49,10 @@ MonoBehaviour:
   - {fileID: 8365487459537967655, guid: 9980e22cd520baf47a213fa852e9363f, type: 3}
   stageVIToXEnemy:
   - {fileID: 8365487459537967655, guid: 9980e22cd520baf47a213fa852e9363f, type: 3}
-  - {fileID: 4759811672600158747, guid: 24508d11fef19bd4caa6c0d8a9a154c2, type: 3}
-  stageXToEnemy: []
+  - {fileID: 2097672467228049542, guid: 42fe9f00de772f5488f8f4c84965359b, type: 3}
+  stageXToEnemy:
+  - {fileID: 8365487459537967655, guid: 9980e22cd520baf47a213fa852e9363f, type: 3}
+  - {fileID: 2097672467228049542, guid: 42fe9f00de772f5488f8f4c84965359b, type: 3}
   spawnPoints:
   - {fileID: 7903164669676765637, guid: a56b718e881f84745af4f094acbad743, type: 3}
   VStageBoss: {fileID: 4107073848118516672, guid: d97bed847a1c85b469a36f54db522e2f, type: 3}

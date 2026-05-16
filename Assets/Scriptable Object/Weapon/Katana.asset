@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f721259cbfa7264da704c2325b09052, type: 3}
   m_Name: Katana
   m_EditorClassIdentifier: 
+  pitch: 1
   weaponName: Katana
   baseDamage: 7
   baseDurability: 250
@@ -20,3 +21,5 @@ MonoBehaviour:
   weaponType: 0
   attackSpeed: 0.5
   attackReach: 3.5
+  projectileSpeed: 15
+  projectileLifetime: 3

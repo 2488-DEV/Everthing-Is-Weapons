@@ -150,7 +150,6 @@ public class SpiderEnemy : MonoBehaviour
         {
             attackTimer = enemyInfo.attackSpeed;
             player.health -= attackDamage;
-            player.ApplyKnockback(transform.position, 2f, 0.1f);
             Debug.Log("<color=orange>BlackEnemy:</color> ตบผู้เล่นสำเร็จ!");
         }
     }
@@ -260,9 +259,8 @@ public class SpiderEnemy : MonoBehaviour
             {
                 float totalDamage = player.attackDamage + (player.attackDamage * (player.bonusAttackDamage / 100));
                 health -= totalDamage;
+                player.health -= 2.5f;
                 isGettingHit = true;
-
-                ApplyKnockback(collision.transform.position);
                 if (weaponHandlerScript != null) weaponHandlerScript.DecreaseDurability(enemyInfo.durabilityCost);
 
                 Debug.Log($"<color=red>BlackEnemy:</color> โดนตบไป {totalDamage}");

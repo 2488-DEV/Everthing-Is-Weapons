@@ -69,6 +69,7 @@ public class Player : MonoBehaviour
     private GameObject webVisualInstance;
 
     [Header("Audio")]
+    public AudioSource audioSource;
     public AudioClip swingSound;
     public AudioClip[] footstepSounds;
     public AudioClip equipSound;
@@ -246,9 +247,9 @@ public class Player : MonoBehaviour
                 attackFacingLeft = isMouseOnLeft;
                 baseAngle = GetMouseAngle() + (attackFacingLeft ? 180f : 0f);
                 weaponHandlerScript.DecreaseDurability(1f);
-
-                if (SoundManagers.instance != null)
-                    SoundManagers.instance.PlaySFX(swingSound);
+                float basePitch = weaponHandlerScript.currentWeapon.pitch;
+                audioSource.pitch = basePitch + Random.Range(-0.1f, 0.2f);
+                audioSource.PlayOneShot(swingSound);
             }
 
             if (attackTimer > 0)

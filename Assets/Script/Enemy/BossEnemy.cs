@@ -314,7 +314,7 @@ public class BossEnemy : MonoBehaviour
                     health -= player.attackDamage + (player.attackDamage * (player.bonusAttackDamage/100));
                     Debug.Log("เสียเลือดไป : " + (player.attackDamage + (player.attackDamage * (player.bonusAttackDamage/100))));
                     isGettingHit = true;
-                    ApplyKnockback(collision.transform.position);
+                    player.health -= 2.5f;
                     weaponHandlerScript.DecreaseDurability(enemyInfo.durabilityCost);
                 }
             }

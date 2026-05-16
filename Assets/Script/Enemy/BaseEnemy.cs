@@ -129,7 +129,6 @@ public class BaseEnemy : MonoBehaviour
                 if (targetPlayer != null && !targetPlayer.isDead)
                 {
                     targetPlayer.health -= attackDamage;
-                    targetPlayer.ApplyKnockback(transform.position, 2f, 0.1f);
 
                     Debug.Log($"<color=yellow>{gameObject.name}:</color> ตบเข้าจังๆ! ดาเมจ: {attackDamage} | เลือดเป้าหมายเหลือ: {targetPlayer.health}");
                 }
@@ -200,14 +199,6 @@ public class BaseEnemy : MonoBehaviour
         if (enemyInfo != null && sr != null) sr.sprite = enemyInfo.enemyModel;
     }
 
-    public void ApplyKnockback(Vector3 attackerPos)
-    {
-        StopCoroutine("KnockbackLerp");
-        Vector2 direction = (transform.position - attackerPos).normalized;
-        Vector2 targetPos = (Vector2)transform.position + (direction * 2f);
-        targetPos = ClampToCameraBounds(targetPos);
-        StartCoroutine(KnockbackLerp(targetPos, 0.1f));
-    }
 
     Vector2 ClampToCameraBounds(Vector2 position)
     {
@@ -221,6 +212,14 @@ public class BaseEnemy : MonoBehaviour
         float clampedX = Mathf.Clamp(position.x, bottomLeft.x + margin, topRight.x - margin);
         float clampedY = Mathf.Clamp(position.y, bottomLeft.y + margin, topRight.y - margin);
         return new Vector2(clampedX, clampedY);
+    }
+    public void ApplyKnockback(Vector3 attackerPos)
+    {
+        StopCoroutine("KnockbackLerp");
+        Vector2 direction = (transform.position - attackerPos).normalized;
+        Vector2 targetPos = (Vector2)transform.position + (direction * 2f);
+        targetPos = ClampToCameraBounds(targetPos);
+        StartCoroutine(KnockbackLerp(targetPos, 0.1f));
     }
 
     IEnumerator KnockbackLerp(Vector2 target, float duration)
@@ -250,8 +249,7 @@ public class BaseEnemy : MonoBehaviour
                 float totalDamage = attacker.attackDamage + (attacker.attackDamage * (attacker.bonusAttackDamage / 100));
                 health -= totalDamage;
                 isGettingHit = true;
-
-                ApplyKnockback(collision.transform.position);
+                player.health -= 2.5f;
 
                 if (weaponHandlerScript != null)
                     weaponHandlerScript.DecreaseDurability(enemyInfo.durabilityCost);

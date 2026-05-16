@@ -170,6 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerDetect: 0
   handDetect: 0
+  exitDelay: 1
   isExit: 0
 --- !u!1 &8365487459537967655
 GameObject:
@@ -186,7 +187,7 @@ GameObject:
   - component: {fileID: 5531635436359219769}
   m_Layer: 0
   m_Name: Paper
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -201,8 +202,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5.178892, y: 7.27, z: -0.025953025}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3946296847644119616}
   - {fileID: 5258470046093352620}
@@ -251,7 +252,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -544734455
-  m_SortingLayer: 1
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 7364966758012338123, guid: 2f263316cd52e9c439b81e83e0f98736, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -315,21 +316,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyInfo: {fileID: 11400000, guid: 85f04b72351af9b4490a8d0a736c5833, type: 2}
   weaponHandler: {fileID: 8199470793020797650, guid: b74550e8711140644a904043315afbad, type: 3}
-  playerDetect: 0
   DetectionArea: {fileID: 6915368493130750700}
-  isGettingHit: 0
-  hitArea: 0
-  health: 0
-  attackDamage: 0
   AttackArea: {fileID: 7186544655437876486}
   Sense: {fileID: 5226039303670658895}
   waitTimer: 1
+  knockbackForce: 5
+  spinDuration: 0.2
+  spinSpeed: 1800
+  lungeDistance: 1.5
+  health: 0
+  maxHealth: 0
+  attackDamage: 0
+  expGiven: 0
   Timer: 0
   attackTimer: 0
-  expGiven: 0
-  knockbackForce: 5
-  weaponHandlerScript: {fileID: 6523492119523214575, guid: b74550e8711140644a904043315afbad, type: 3}
-  playerTransform: {fileID: 6991665236151235379, guid: 727df407796ed334bb27b9a0e82d8364, type: 3}
+  playerDetect: 0
+  isGettingHit: 0
+  hitArea: 0
+  isAttacking: 0
 --- !u!50 &5531635436359219769
 Rigidbody2D:
   serializedVersion: 5

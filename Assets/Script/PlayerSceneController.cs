@@ -16,6 +16,9 @@ public class PlayerSceneController : MonoBehaviour
 
     private bool hasTriggered = false;
 
+    public bool isEnemyLeft;
+    public GameObject[] enemies;
+    public GameObject[] bosses;
     void Start()
     {
         Debug.Log("[PlayerSceneController] Script is attached and running on: " + gameObject.name);
@@ -34,6 +37,9 @@ public class PlayerSceneController : MonoBehaviour
 
     void Update()
     {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        GameObject[] bosses = GameObject.FindGameObjectsWithTag("Boss");
+        isEnemyLeft = enemies.Length > 0 || bosses.Length > 0;
         if (hasTriggered) return;
 
         // Use OverlapCircle to detect any "Door" tagged colliders nearby
@@ -42,9 +48,7 @@ public class PlayerSceneController : MonoBehaviour
         {
             if (hit.CompareTag("Door"))
             {
-                InGameScript.NextStage();
                 Debug.Log("[PlayerSceneController] Detected Door via OverlapCircle!");
-                hasTriggered = true;
                 LoadRandomScene();
                 return;
             }
@@ -58,8 +62,6 @@ public class PlayerSceneController : MonoBehaviour
 
         if (!hasTriggered && collision.CompareTag("Door"))
         {
-            InGameScript.NextStage();
-            hasTriggered = true;
             LoadRandomScene();
         }
     }
@@ -70,18 +72,18 @@ public class PlayerSceneController : MonoBehaviour
 
         if (!hasTriggered && collision.gameObject.CompareTag("Door"))
         {
-            InGameScript.NextStage();
-            hasTriggered = true;
             LoadRandomScene();
         }
     }
 
     private void LoadRandomScene()
     {
-        if (InGameScript.currentEnemyCount == 0)
+        if (!isEnemyLeft)
         {
             if (randomScenes != null && randomScenes.Length > 0)
             {
+                hasTriggered = true;
+                InGameScript.NextStage();
                 int randomIndex = Random.Range(0, randomScenes.Length);
                 string sceneToLoad = randomScenes[randomIndex];
                 Debug.Log("[PlayerSceneController] Loading random scene: " + sceneToLoad);
